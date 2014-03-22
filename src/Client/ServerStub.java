@@ -9,7 +9,12 @@ public class ServerStub {
 	//the idea is that the file manager never has to deal with messages just the required content
 	//should this be a static clasS????
 	
-	//TODO constructor, must decide on static first
+	NetworkClient networkClient;
+	
+	public ServerStub(NetworkClient networkClient) {
+		this.networkClient = networkClient;
+		
+	}
 	
 	//methods might be to be oveloaded to provide option of merely passing filename
 	public boolean shareFile(File file, String targetUser){
