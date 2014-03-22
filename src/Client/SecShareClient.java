@@ -76,7 +76,8 @@ public class SecShareClient {
 		String[] serverAddressAux = serverAddress.split(":");
 		
 		NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]));
-		SecFileManager mFileManager = new SecFileManager(clientFiles, netClient);
+		ServerStub mServerStub = new ServerStub(netClient);
+		SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub);
 		
 		
 		//TODO check user password?
