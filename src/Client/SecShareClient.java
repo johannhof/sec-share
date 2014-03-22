@@ -21,6 +21,7 @@ public class SecShareClient {
 		String userID = null;
 		String serverAddress = null;
 		String mode = null;
+		String targetUser;
 		//might want to use some other data structure
 		List<File> clientFiles = new ArrayList<File>();
 
@@ -76,7 +77,7 @@ public class SecShareClient {
 		String[] serverAddressAux = serverAddress.split(":");
 		
 		NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]));
-		ServerStub myServerStub = new ServerStub(netClient);
+		ServerStub mServerStub = new ServerStub(netClient);
 		SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub);
 		
 		
@@ -92,7 +93,7 @@ public class SecShareClient {
 
 		case "-c" : mFileManager.uploadAll();
 			break;
-		case "-p" : //TODO
+		case "-p" : mFileManager.ShareFiles(targetUser);
 			break;
 		case "-g" : mFileManager.downloadAll();
 			break;

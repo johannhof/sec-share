@@ -3,6 +3,7 @@ package Client;
 import java.io.File;
 import java.util.List;
 
+//This class implements the core file operations
 public class SecFileManager {
 
 	List<File> userFiles;
@@ -29,6 +30,11 @@ public class SecFileManager {
 	}
 
 	public void SyncFiles(int syncTimer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void ShareFiles(String targetUser) {
 		// TODO Auto-generated method stub
 		
 	}
