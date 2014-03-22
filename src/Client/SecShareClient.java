@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,7 +14,6 @@ public class SecShareClient {
 	private static final int SYNC_TIMER = 30;
 	private static final String CLIENT_HOME = " ";
 
-
 	//SecShareClient -u <userId> -a <serverAddress> ( -c <filenames> | -p <userId> <filenames> | -g <filenames> | -s <filenames>)
 	public static void main(String[] args) {
 
@@ -21,8 +21,7 @@ public class SecShareClient {
 		String serverAddress = null;
 		String mode = null;
 		//might want to use some other data structure
-		List<File> clientFiles = null;
-
+		List<File> clientFiles = new ArrayList<>();
 
 		//CL argument handling
 		//TODO check filenames, organize better, be more thorough in checking for wrong CL options
@@ -65,11 +64,9 @@ public class SecShareClient {
 		try {
 			inputReader.readLine();
 		} catch (IOException e) {
-
 			e.printStackTrace();
 		}
 		
-	
 		//connect to the server
 		NetworkClient netClient = new NetworkClient(userID, serverAddress);
 		SecFileManager mFileManager = new SecFileManager(clientFiles, netClient);
