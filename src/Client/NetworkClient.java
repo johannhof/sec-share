@@ -45,9 +45,9 @@ public class NetworkClient {
 		
 	}
 	
-	public boolean login(){
-		//TODO
-	}
+//	public boolean login(){
+//		//TODO
+//	}
 
 	public void disconnect() {
 		

@@ -9,7 +9,6 @@ public class ExitMessage extends Message {
 
 	public ExitMessage() {
 		super(OpCode.EXIT);
-		// TODO Auto-generated constructor stub
 	}
 
 }

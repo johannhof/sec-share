@@ -21,7 +21,7 @@ public class SecShareClient {
 		String userID = null;
 		String serverAddress = null;
 		String mode = null;
-		String targetUser;
+		String targetUser = null;
 		//might want to use some other data structure
 		List<File> clientFiles = new ArrayList<File>();
 
@@ -82,6 +82,8 @@ public class SecShareClient {
 		
 		
 		//TODO check user password?
+		
+		
 		try {
 			inputReader.close();
 		} catch (IOException e) {
