@@ -1,6 +1,7 @@
 package Client;
 
 import java.io.File;
+import Message.*;
 
 public class ServerStub {
 //adapter class that takes the client requests such as a listing, file upload, file download and converts them in the appropriate 
