@@ -24,8 +24,8 @@ public class RequestHandler implements Runnable {
     @Override
     public void run() {
         try {
+            InputStream inputStream = socket.getInputStream();
             while (true) {
-                InputStream inputStream = socket.getInputStream();
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
                 Message message = (Message) objectInputStream.readObject();
 
