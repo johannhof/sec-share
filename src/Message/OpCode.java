@@ -1,5 +1,5 @@
 package Message;
 
 public enum OpCode {
-	EXIT, FILEINFO,
+    LOGIN, EXIT, LIST, PUT, GET, SHARE, SERVER_MESSAGE
 }

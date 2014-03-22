@@ -24,13 +24,15 @@ public class RequestHandler implements Runnable {
     @Override
     public void run() {
         try {
+            boolean listen = true;
             InputStream inputStream = socket.getInputStream();
-            while (true) {
+            while (listen) {
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
                 Message message = (Message) objectInputStream.readObject();
 
                 switch (message.GetOp()) {
                     case EXIT:
+                        listen = false;
                         System.out.println("EXIT");
                     default:
                         System.out.println("wtf");

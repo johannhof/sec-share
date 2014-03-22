@@ -14,6 +14,6 @@ public class FileInfo {
 		this.lastModified = lastModified;
 		this.owner = owner;
 		this.shares = shares;
-		
-	}
+
+    }
 }
