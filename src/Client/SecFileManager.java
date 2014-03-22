@@ -6,11 +6,11 @@ import java.util.List;
 public class SecFileManager {
 
 	List<File> userFiles;
-	NetworkClient netClient;
+	ServerStub myServer;
 	
-	public SecFileManager(List<File> clientFiles, NetworkClient netClient) {
+	public SecFileManager(List<File> clientFiles, ServerStub server) {
 		this.userFiles = clientFiles;
-		this.netClient = netClient;
+		this.myServer = server;
 	}
 
 	public void uploadAll() {
