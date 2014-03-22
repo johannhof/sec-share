@@ -24,7 +24,6 @@ public class SecShareServer {
             System.out.println("Execution options:");
             System.out.println("SecShareServer <port>");
             System.exit(-1);
-
         }
 
         //setup
