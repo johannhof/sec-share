@@ -8,35 +8,37 @@ public class SecFileManager {
 
 	List<File> userFiles;
 	ServerStub myServer;
-	
-	public SecFileManager(List<File> clientFiles, ServerStub server) {
+	File clientHome;
+
+	public SecFileManager(List<File> clientFiles, ServerStub server, String clientHome) {
 		this.userFiles = clientFiles;
 		this.myServer = server;
+		this.clientHome = new File(clientHome);
 	}
 
 	public void uploadAll() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void downloadAll() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void listAll() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void SyncFiles(int syncTimer) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public void ShareFiles(String targetUser) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
