@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +22,7 @@ public class SecShareClient {
 		String serverAddress = null;
 		String mode = null;
 		//might want to use some other data structure
-		List<File> clientFiles = null;
+		List<File> clientFiles = new ArrayList<File>();
 
 
 		//CL argument handling
@@ -71,8 +72,12 @@ public class SecShareClient {
 		
 	
 		//connect to the server
-		NetworkClient netClient = new NetworkClient(userID, serverAddress);
-		SecFileManager mFileManager = new SecFileManager(clientFiles, netClient);
+		//TODO missing a try catch or a check to see if addrss is properly formated
+		String[] serverAddressAux = serverAddress.split(":");
+		
+		NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]));
+		ServerStub myServerStub = new ServerStub(netClient);
+		SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub);
 		
 		
 		//TODO check user password?
