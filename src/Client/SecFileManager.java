@@ -5,8 +5,12 @@ import java.util.List;
 
 public class SecFileManager {
 
+	List<File> userFiles;
+	NetworkClient netClient;
+	
 	public SecFileManager(List<File> clientFiles, NetworkClient netClient) {
-		// TODO Auto-generated constructor stub
+		this.userFiles = clientFiles;
+		this.netClient = netClient;
 	}
 
 	public void uploadAll() {

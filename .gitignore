@@ -12,3 +12,7 @@ bin/
 # intellij
 .idea/
 *.iml
+
+#eclipse
+.classpath
+.project
