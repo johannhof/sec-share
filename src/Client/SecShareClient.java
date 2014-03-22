@@ -76,7 +76,7 @@ public class SecShareClient {
 		String[] serverAddressAux = serverAddress.split(":");
 		
 		NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]));
-		ServerStub mServerStub = new ServerStub(netClient);
+		ServerStub myServerStub = new ServerStub(netClient);
 		SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub);
 		
 		
