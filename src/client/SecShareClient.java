@@ -1,4 +1,4 @@
-package Client;
+package client;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -101,7 +101,7 @@ public class SecShareClient {
 			break;
 		case "-s" : mFileManager.SyncFiles(SYNC_TIMER);
 			break;
-		case "-l" : mFileManager.listAll();
+		case "-l" : mFileManager.listFiles();
 			break;
 		default : //Crap throw exception
 			break;

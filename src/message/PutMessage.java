@@ -1,4 +1,4 @@
-package Message;
+package message;
 
 public class PutMessage extends Message {
 

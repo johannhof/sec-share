@@ -1,7 +1,10 @@
-package Client;
+package client;
 
 import java.io.File;
-import Message.*;
+import java.util.List;
+
+import file_services.FileInfo;
+import message.*;
 
 public class ServerStub {
 //adapter class that takes the client requests such as a listing, file upload, file download and converts them in the appropriate 
@@ -19,12 +22,12 @@ public class ServerStub {
 	
 	//methods might be to be oveloaded to provide option of merely passing filename
 	public boolean shareFile(File file, String targetUser){
-		
+		//must write out error message if failed
 	}
 	
 	//Datastructure for file management might be something other than pleb old list...
 	public List<FileInfo> listFiles() {
-		
+
 	}
 	
 	public boolean putFile() {
@@ -35,11 +38,11 @@ public class ServerStub {
 		
 	}
 	
-	public boolean putAllFiles() {
+	public boolean putFiles(List<File> files) {
 		
 	}
 	
-	public boolean getAllFiles() {
+	public boolean getFiles() {
 		
 	}
 	

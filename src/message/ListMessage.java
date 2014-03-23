@@ -1,6 +1,8 @@
-package Message;
+package message;
 
 import java.util.List;
+
+import file_services.FileInfo;
 
 public class ListMessage extends Message{
 

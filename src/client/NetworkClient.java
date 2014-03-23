@@ -1,4 +1,4 @@
-package Client;
+package client;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,8 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-
-import Message.*;
+import message.*;
 
 public class NetworkClient {
 
@@ -83,7 +82,7 @@ public class NetworkClient {
 			cfn1.printStackTrace();
 
 		} catch (IOException ioe1) {
-			System.out.println("Message exchange failure");
+			System.out.println("message exchange failure");
 			ioe1.printStackTrace();
 
 		}
@@ -94,7 +93,7 @@ public class NetworkClient {
 	//TODO must receive reply and display error message if it fails	
 	}
 	
-	public boolean receiveFile(File directory, String filename) {
+	public boolean receiveFile(File clientHome, String filename) {
 		//TODO
 	}
 	
