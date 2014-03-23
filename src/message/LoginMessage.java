@@ -13,4 +13,11 @@ public class LoginMessage extends Message {
 		
 	}
 
+	public String getUsername() {
+		return this.username;
+	}
+
+	public String getPassword() {
+		return this.password;
+	}
 }

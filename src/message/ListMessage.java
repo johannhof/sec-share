@@ -13,4 +13,8 @@ public class ListMessage extends Message{
 		this.fileInfo = fileInfo;
 	}
 
+	public List<FileInfo> getFileInfo() {
+		return this.fileInfo;
+	}
+
 }

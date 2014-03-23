@@ -11,4 +11,12 @@ public class PutMessage extends Message {
 		this.timestamp = timestamp;
 	}
 
+	public String getFilename() {
+		return this.filename;
+	}
+
+	public long getTimestamp() {
+		return this.timestamp;
+	}
+
 }

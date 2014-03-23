@@ -13,6 +13,8 @@ public class ServerStub {
 	//the idea is that the file manager never has to deal with messages just the required content
 	//should this be a static clasS????
 	
+	//methods might be to be oveloaded to provide option of merely passing filename
+	
 	NetworkClient networkClient;
 	
 	public ServerStub(NetworkClient networkClient) {
@@ -20,9 +22,11 @@ public class ServerStub {
 		
 	}
 	
-	//methods might be to be oveloaded to provide option of merely passing filename
-	public boolean shareFile(File file, String targetUser){
-		//must write out error message if failed
+	//returns a boolean array which is the result of each share
+	public boolean[] shareFiles(File file, String targetUser){
+		//TODO must return error message if failed
+		
+		
 	}
 	
 	//Datastructure for file management might be something other than pleb old list...

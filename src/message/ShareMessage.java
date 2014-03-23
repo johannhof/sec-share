@@ -14,4 +14,12 @@ public class ShareMessage extends Message {
 		this.targetUser = targetUser;
 	}
 
+	public List<String> getFilenames() {
+		return this.filenames;
+	}
+
+	public String getTargetUser() {
+		return this.targetUser;
+	}
+
 }

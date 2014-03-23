@@ -61,11 +61,12 @@ public class SecShareClient {
 		//TODO check the files
 		
 		//get user password
+		String password = null;
 		BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("Welcome to SecShare\n");
 		System.out.println("Please enter your password");
 		try {
-			inputReader.readLine();
+			password = inputReader.readLine();
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -77,11 +78,14 @@ public class SecShareClient {
 		String[] serverAddressAux = serverAddress.split(":");
 		
 		NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]));
+		
+		//TODO check user password?
+		netClient.login(password);
+		
 		ServerStub mServerStub = new ServerStub(netClient);
 		SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub, CLIENT_HOME);
 		
 		
-		//TODO check user password?
 		
 		
 		try {

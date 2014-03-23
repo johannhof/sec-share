@@ -9,4 +9,8 @@ public class GetMessage extends Message {
 		
 	}
 
+	public String getFilename() {
+		return this.filename;
+	}
+
 }
