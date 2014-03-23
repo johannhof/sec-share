@@ -1,6 +1,7 @@
 package client;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import file_services.FileInfo;
@@ -23,15 +24,30 @@ public class ServerStub {
 	}
 	
 	//returns a boolean array which is the result of each share
-	public boolean[] shareFiles(File file, String targetUser){
+	//can only share files already on the server
+	public boolean[] shareFiles(List<File> files, String targetUser){
 		//TODO must return error message if failed
 		
+		ArrayList<String> filenames = new ArrayList<String>();
 		
+		for(File f : files)
+			filenames.add(f.getName());
+		
+		ShareMessage request = new ShareMessage(filenames, targetUser);
+		MultiReply reply = (MultiReply) networkClient.msgSendReceive(request);
+		
+		//TODO careful with the order, the server must return the replies in the same order as the requests otherwise must add a filename list to multireply
+		return reply.getResults();		
 	}
 	
 	//Datastructure for file management might be something other than pleb old list...
 	public List<FileInfo> listFiles() {
-
+		
+		ListMessage request = new ListMessage(null);
+		
+		ListMessage reply = (ListMessage) networkClient.msgSendReceive(request);
+		
+		return reply.getFileInfo();
 	}
 	
 	public boolean putFile() {
