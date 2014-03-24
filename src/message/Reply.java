@@ -9,9 +9,7 @@ public class Reply extends Message {
 		this.result = result;
 	}
 
-    // TODO is that the right method name?
-    // shouldn't it be something like isSuccess or getResult?
-    public boolean isResult() {
+    public boolean getResult() {
         return this.result;
 	}
 	

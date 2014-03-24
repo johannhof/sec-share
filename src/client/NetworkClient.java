@@ -105,7 +105,7 @@ public class NetworkClient {
 
         // TODO isResult is probably not meant for this, right?
         // if the server allows the upload
-        if (reply.isResult()) {
+        if (reply.getResult()) {
             FileOperations.upload(file, outStream);
             return true;
         }
