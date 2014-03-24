@@ -1,7 +1,5 @@
 package client;
 
-import file_services.FileOperations;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +29,7 @@ public class SecShareClient {
         //TODO -l option NOT YET HANDLED, should only have 1 argument
         //TODO -l has no arguments
         //TODO argument handling will assumed a list of files separated by spaces
- 
+
         if (args.length >= 6) {
             if (args[0].equals("-u") && args[2].equals("-a")) {
 
@@ -40,7 +38,7 @@ public class SecShareClient {
                 serverAddress = args[3];
                 mode = args[4];
 
-                	//TODO change this to space
+                //TODO change this to space
                 //how are filenames separated? assuming comma
                 for (String filename : args[5].split(",")) {
                     //check for exceptions
