@@ -2,15 +2,15 @@ package message;
 
 public class Reply extends Message {
 
-	private boolean result;
-	
-	public Reply(boolean result) {
-		super(OpCode.REPLY);
-		this.result = result;
-	}
+    private boolean success;
 
-    public boolean getResult() {
-        return this.result;
-	}
-	
+    public Reply(boolean success) {
+        super(OpCode.REPLY);
+        this.success = success;
+    }
+
+    public boolean isSuccess() {
+        return this.success;
+    }
+
 }

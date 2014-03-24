@@ -43,7 +43,7 @@ public class NetworkClient {
 
     public boolean login(String username, String password) {
         Reply reply = (Reply) msgSendReceive(new LoginMessage(username, password));
-        return reply.getResult();
+        return reply.isSuccess();
     }
 
     public void disconnect() {
@@ -102,7 +102,7 @@ public class NetworkClient {
 
         // TODO isResult is probably not meant for this, right?
         // if the server allows the upload
-        if (reply.getResult()) {
+        if (reply.isSuccess()) {
             FileOperations.upload(file, outStream);
             return true;
         }
