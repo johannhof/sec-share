@@ -67,6 +67,8 @@ public class RequestHandler implements Runnable {
                         System.out.println("wtf");
                 }
             }
+        } catch (EOFException e) {
+            System.out.println("Client disconnected");
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
