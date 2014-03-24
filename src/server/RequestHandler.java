@@ -45,14 +45,14 @@ public class RequestHandler implements Runnable {
                     case PUT:
                         System.out.println("PUT");
                         PutMessage putMessage = (PutMessage) message;
-                        FileOperations file = new FileOperations(this.serverDirectory, putMessage.getFilename());
+                        File file = new File(this.serverDirectory, putMessage.getFilename());
 
                         // if there is a younger file on the server
                         if (file.exists() && file.lastModified() > putMessage.getTimestamp()) {
                             respond(new Reply(false), socket.getOutputStream());
                         } else {
                             respond(new Reply(true), socket.getOutputStream());
-                            file.download(inputStream, putMessage.getFilesize());
+                            FileOperations.download(inputStream, putMessage.getFilename(), putMessage.getFilesize());
                         }
 
                         break;
