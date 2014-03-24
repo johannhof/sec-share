@@ -1,6 +1,6 @@
 package server;
 
-import file_services.SharedFile;
+import file_services.FileOperations;
 import message.LoginMessage;
 import message.Message;
 import message.PutMessage;
@@ -49,14 +49,14 @@ public class RequestHandler implements Runnable {
                         assert message instanceof PutMessage;
 
                         PutMessage putMessage = (PutMessage) message;
-                        SharedFile file = new SharedFile(this.serverDirectory, putMessage.getFilename());
+                        File file = new File(this.serverDirectory, putMessage.getFilename());
 
                         // if there is a younger file on the server
                         if (file.exists() && file.lastModified() > putMessage.getTimestamp()) {
                             respond(new Reply(false), socket.getOutputStream());
                         } else {
                             respond(new Reply(true), socket.getOutputStream());
-                            file.download(inputStream, putMessage.getFilesize());
+                            FileOperations.download(inputStream, putMessage.getFilename(), putMessage.getFilesize());
                         }
 
                         break;

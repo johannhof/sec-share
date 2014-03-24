@@ -1,7 +1,7 @@
 package client;
 
 import file_services.FileInfo;
-import file_services.SharedFile;
+import file_services.FileOperations;
 import message.ListMessage;
 import message.MultiReply;
 import message.ShareMessage;
@@ -14,9 +14,7 @@ public class ServerStub {
 //adapter class that takes the client requests such as a listing, file upload, file download and converts them in the appropriate 
 	//messages and calls the network client procedures
     //typical methods here will be download file, get file
-    //the idea is that the file manager never has to deal with messages just the required content
-	//should this be a static clasS????
-	
+    //the idea is that the file manager never has to deal with messages just the required content	
 	//methods might be to be oveloaded to provide option of merely passing filename
 	
 	NetworkClient networkClient;
@@ -28,7 +26,7 @@ public class ServerStub {
 	
 	//returns a boolean array which is the result of each share
 	//can only share files already on the server
-	public boolean[] shareFiles(List<SharedFile> files, String targetUser){
+	public boolean[] shareFiles(List<File> files, String targetUser){
 		//TODO must return error message if failed
 		
 		ArrayList<String> filenames = new ArrayList<String>();
@@ -54,7 +52,7 @@ public class ServerStub {
 	}
 
 	
-    public boolean putFile(SharedFile file) {
+    public boolean putFile(File file) {
         return networkClient.sendFile(file);
     }
 
@@ -64,13 +62,13 @@ public class ServerStub {
         return true;
     }
 
-    public boolean[] putFiles(List<SharedFile> files) {
+    public boolean[] putFiles(List<File> files) {
         
     	//TODO same issue as file sharing this needs to have an order consistant wiht server processing, not a problem just a concern :P
     	boolean[] replies = new boolean[files.size()];
     	int i = 0;
     	
-    	for(SharedFile file: files)
+    	for(File file: files)
     		replies[i++] = putFile(file);
     		
         return replies;

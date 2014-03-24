@@ -1,7 +1,10 @@
 package client;
 
-import file_services.SharedFile;
-import message.*;
+import file_services.FileOperations;
+import message.ExitMessage;
+import message.Message;
+import message.PutMessage;
+import message.Reply;
 
 import java.io.*;
 import java.net.Socket;
@@ -12,8 +15,9 @@ public class NetworkClient {
     String userID;
     OutputStream outStream;
     InputStream inStream;
+    String clientHome;
 
-    public NetworkClient(String userID, String host, int port) {
+    public NetworkClient(String userID, String host, int port, String clientHome) {
 
         this.userID = userID;
 
@@ -91,7 +95,7 @@ public class NetworkClient {
      * @param file the file to send
      * @return a boolean indicating if the file was uploaded
      */
-    public boolean sendFile(SharedFile file) {
+    public boolean sendFile(File file) {
         if (file == null || !file.exists()) {
             throw new IllegalArgumentException("Cannot find file to send");
         }
@@ -101,8 +105,8 @@ public class NetworkClient {
 
         // TODO isResult is probably not meant for this, right?
         // if the server allows the upload
-        if (reply.isResult()) {
-            file.upload(outStream);
+        if (reply.getResult()) {
+            FileOperations.upload(file, outStream);
             return true;
         }
 
