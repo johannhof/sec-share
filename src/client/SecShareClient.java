@@ -74,8 +74,12 @@ public class SecShareClient {
 
         NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]));
 
-        //TODO check user password?
-        netClient.login(password);
+        if (netClient.login(userID, password)) {
+            System.out.println("Logged in as" + userID);
+        } else {
+            System.err.println("Invalid Login");
+            System.exit(-1);
+        }
 
         ServerStub mServerStub = new ServerStub(netClient);
         SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub, CLIENT_HOME);

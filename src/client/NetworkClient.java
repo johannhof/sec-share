@@ -1,10 +1,7 @@
 package client;
 
 import file_services.SharedFile;
-import message.ExitMessage;
-import message.Message;
-import message.PutMessage;
-import message.Reply;
+import message.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -43,9 +40,9 @@ public class NetworkClient {
 
     }
 
-    public boolean login(String password) {
-        //TODO
-        return true;
+    public boolean login(String username, String password) {
+        Reply reply = (Reply) msgSendReceive(new LoginMessage(username, password));
+        return reply.isResult();
     }
 
     public void disconnect() {
