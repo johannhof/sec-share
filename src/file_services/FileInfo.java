@@ -55,4 +55,17 @@ public class FileInfo implements Serializable {
     public void setShares(List<String> shares) {
         this.shares = shares;
     }
+
+	@Override
+	public String toString() {
+		
+		StringBuilder sharesAux = new StringBuilder();
+		for(String st : this.shares)
+			sharesAux.append(st + " ");
+		
+		return "Filename: " + this.filename + "\n\t" +
+				"Last Modified: " + this.lastModified  + "\n\t" + 
+				"Owner: " + this.owner  + "\n\t" +  
+				"Shared with: " +  sharesAux.toString() + "\n\n";
+	}
 }
