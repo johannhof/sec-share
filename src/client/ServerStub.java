@@ -1,6 +1,7 @@
 package client;
 
 import file_services.FileInfo;
+import file_services.SharedFile;
 import message.ListMessage;
 import message.MultiReply;
 import message.ShareMessage;
@@ -12,8 +13,8 @@ import java.util.List;
 public class ServerStub {
 //adapter class that takes the client requests such as a listing, file upload, file download and converts them in the appropriate 
 	//messages and calls the network client procedures
-	//typical methods here will be put file, get file
-	//the idea is that the file manager never has to deal with messages just the required content
+    //typical methods here will be download file, get file
+    //the idea is that the file manager never has to deal with messages just the required content
 	//should this be a static clasS????
 	
 	//methods might be to be oveloaded to provide option of merely passing filename
@@ -52,7 +53,7 @@ public class ServerStub {
 		return reply.getFileInfo();
 	}
 
-    public boolean putFile(File file) {
+    public boolean putFile(SharedFile file) {
         return networkClient.sendFile(file);
     }
 
@@ -62,12 +63,8 @@ public class ServerStub {
         return true;
     }
 
-    public boolean putFiles(List<File> files) {
-
-        for (File file : files) {
-            putFile(file);
-        }
-
+    public boolean putFiles(List<SharedFile> files) {
+        files.forEach(this::putFile);
         return true;
     }
 

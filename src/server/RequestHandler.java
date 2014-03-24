@@ -1,11 +1,13 @@
 package server;
 
+import file_services.SharedFile;
 import message.Message;
 import message.PutMessage;
 import message.Reply;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class RequestHandler implements Runnable {
 
@@ -50,7 +52,7 @@ public class RequestHandler implements Runnable {
                             respond(new Reply(false), socket.getOutputStream());
                         } else {
                             respond(new Reply(true), socket.getOutputStream());
-                            file.put(inputStream, putMessage.getFilesize());
+                            file.download(inputStream, putMessage.getFilesize());
                         }
 
                         break;
@@ -67,7 +69,7 @@ public class RequestHandler implements Runnable {
                         System.out.println("wtf");
                 }
             }
-        } catch (EOFException e) {
+        } catch (SocketException | EOFException e) {
             System.out.println("Client disconnected");
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();

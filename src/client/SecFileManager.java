@@ -1,17 +1,19 @@
 package client;
 
+import file_services.SharedFile;
+
 import java.io.File;
 import java.util.List;
 
 //This class implements the core file operations so they aren't all stacked up on main
 public class SecFileManager {
 
-	List<File> userFiles;
-	ServerStub myServer;
+    List<SharedFile> userFiles;
+    ServerStub myServer;
 	File clientHome;
 
-	public SecFileManager(List<File> clientFiles, ServerStub server, String clientHome) {
-		this.userFiles = clientFiles;
+    public SecFileManager(List<SharedFile> clientFiles, ServerStub server, String clientHome) {
+        this.userFiles = clientFiles;
 		this.myServer = server;
 		this.clientHome = new File(clientHome);
 	}

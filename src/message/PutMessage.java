@@ -1,15 +1,18 @@
 package message;
 
+import java.io.File;
+
 public class PutMessage extends Message {
 
     private String filename;
-    private int filesize;
+    private long filesize;
     private long timestamp;
 
-    public PutMessage(String filename, long timestamp) {
+    public PutMessage(File file) {
         super(OpCode.PUT);
-        this.filename = filename;
-        this.timestamp = timestamp;
+        this.filename = file.getName();
+        this.filesize = file.length();
+        this.timestamp = file.lastModified();
     }
 
     public String getFilename() {
@@ -20,7 +23,7 @@ public class PutMessage extends Message {
         return timestamp;
     }
 
-    public int getFilesize() {
+    public long getFilesize() {
         return filesize;
     }
 }

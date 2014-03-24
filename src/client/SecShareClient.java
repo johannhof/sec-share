@@ -1,7 +1,8 @@
 package client;
 
+import file_services.SharedFile;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.List;
 public class SecShareClient {
 
     private static final int SYNC_TIMER = 30;
-    private static final String CLIENT_HOME = " ";
+    private static final String CLIENT_HOME = "./clientdir";
 
 
     //SecShareClient -u <userId> -a <serverAddress> ( -c <filenames> | -p <userId> <filenames> | -g <filenames> | -s <filenames>)
@@ -21,8 +22,7 @@ public class SecShareClient {
         String mode = null;
         String targetUser = null;
         //might want to use some other data structure
-        List<File> clientFiles = new ArrayList<File>();
-
+        List<SharedFile> clientFiles = new ArrayList<>();
 
         //CL argument handling
         //TODO check filenames, organize better, be more thorough in checking for wrong CL options
@@ -37,9 +37,9 @@ public class SecShareClient {
                 mode = args[4];
 
                 //how are filenames separated? assuming comma
-                for (String aux : args[5].split(",")) {
+                for (String filename : args[5].split(",")) {
                     //check for exceptions
-                    clientFiles.add(new File(aux));
+                    clientFiles.add(new SharedFile(CLIENT_HOME, filename));
                 }
             }
         } else {

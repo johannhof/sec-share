@@ -6,9 +6,7 @@ import java.net.ServerSocket;
 
 public class SecShareServer {
 
-    private static final String SERVER_REPO = "./";
-    //static port or received from CL arguments? WTH?
-    //private static final int SERVER_PORT = 23456;
+    private static final String SERVER_REPO = "./serverdir";
 
     public static void main(String[] args) {
 
@@ -29,13 +27,12 @@ public class SecShareServer {
         //setup
         File serverDirectory = new File(SERVER_REPO);
         boolean listening = true;
-        ServerSocket serverSocket = null;
 
         System.out.println("Welcome to SecShare\n");
 
         //open server socket
         try {
-            serverSocket = new ServerSocket(port);
+            ServerSocket serverSocket = new ServerSocket(port);
 
             //start listening for incoming requests
             while (listening)

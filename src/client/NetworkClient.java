@@ -1,5 +1,6 @@
 package client;
 
+import file_services.SharedFile;
 import message.ExitMessage;
 import message.Message;
 import message.PutMessage;
@@ -87,19 +88,30 @@ public class NetworkClient {
         return reply;
     }
 
-    public boolean sendFile(File file) {
-        //TODO must receive reply and display error message if it fails
-
-        PutMessage putMessage = new PutMessage(file.getName(), file.lastModified());
-
-        Reply reply = (Reply) msgSendReceive(putMessage);
-
-        // TODO isResult is probably not meant for this, right?
-        if (reply.isResult()) {
-            System.out.println("Wow!");
+    /**
+     * Requests a PUT on the server and then sends the specified file.
+     *
+     * @param file the file to send
+     * @return a boolean indicating if the file was uploaded
+     */
+    public boolean sendFile(SharedFile file) {
+        if (file == null || !file.exists()) {
+            throw new IllegalArgumentException("Cannot find file to send");
         }
 
-        return true;
+        // request a download on the server
+        Reply reply = (Reply) msgSendReceive(new PutMessage(file));
+
+        // TODO isResult is probably not meant for this, right?
+        // if the server allows the upload
+        if (reply.isResult()) {
+            file.upload(outStream);
+            return true;
+        }
+
+        // TODO warn that file is out of date
+        return false;
+
     }
 
     public boolean receiveFile(File clientHome, String filename) {
