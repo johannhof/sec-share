@@ -24,11 +24,8 @@ public class SecShareClient {
 		List<File> clientFiles = new ArrayList<>();
 
 		//CL argument handling
-		//TODO check filenames, be more thorough in checking for wrong CL options
-		//TODO -p OPTION NOT YET HANDLED, has an extra argument
-		//TODO -l option NOT YET HANDLED, should only have 1 argument
-		//TODO -l has no arguments
-		//TODO argument handling will assumed a list of files separated by spaces
+		//argument handling will assumed a list of files separated by spaces
+		//TODO allow any argument order?
 
 		if ((args.length >= 5) && args[0].equals("-u") && args[2].equals("-a")) {
 
@@ -37,21 +34,38 @@ public class SecShareClient {
 			serverAddress = args[3];
 			mode = args[4];
 
-
-			for (String filename : args[5].split(" ")) {
-				//check for exceptions
-				//clientFiles.add(CLIENT_HOME, filename));
-			}
-
 		} else {
-			//replace with Illegal argument exception?
-			System.out.println("Improperly formatted arguments");
-			System.out.println("Execution options:");
-			System.out.println("SecShareClient -u <userId> -a <serverAddress> ( -c <filenames> | -p <userId> <filenames> | -g <filenames> | -s <filenames>)");
-			System.exit(-1);
+			throw new IllegalArgumentException("Invalid command line arguments \n\t Execution options:\n\t SecShareClient -u <userId> -a <serverAddress> ( -c <filenames> | -p <userId> <filenames> | -g <filenames> | -s <filenames>)");
 		}
 
-		//TODO check the files
+		//check and add the files and share target
+		if(mode != "-l"){
+			int i = 5;
+
+			//if it's a share
+			if(mode == "-p") {
+				targetUser = args[5];
+				i=6;
+			}
+			
+			//check files and add
+			while(i < args.length){
+				File file = new File(args[i]);
+				
+				if(file == null || !file.exists() || !file.isFile())
+		            throw new IllegalArgumentException("File not found");
+				else
+					clientFiles.add(file);
+			}
+
+		}
+
+		
+		//connect to the server
+		//TODO missing a try catch or a check to see if address is properly formated
+		String[] serverAddressAux = serverAddress.split(":");
+
+		NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]), CLIENT_HOME);
 
 		//get user password
 		String password = null;
@@ -66,29 +80,24 @@ public class SecShareClient {
 		}
 
 
-		//connect to the server
-		//TODO missing a try catch or a check to see if addrss is properly formated
-		String[] serverAddressAux = serverAddress.split(":");
-
-		NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]), CLIENT_HOME);
-
-		//TODO check user password?
+		//check user password?
 		if (netClient.login(userID, password)) {
 			System.out.println("Logged in as" + userID);
 		} else {
+			///TODO exception here or allow new attempts
 			System.err.println("Invalid Login");
 			System.exit(-1);
 		}
-
-		ServerStub mServerStub = new ServerStub(netClient);
-		SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub, CLIENT_HOME);
-
 
 		try {
 			inputReader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		//TODO possible problem with clientfiles beind null in case of -l
+		ServerStub mServerStub = new ServerStub(netClient);
+		SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub, CLIENT_HOME);
 
 		//main switch, manages operation mode
 		switch (mode) {
