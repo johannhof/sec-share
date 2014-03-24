@@ -93,7 +93,6 @@ public class NetworkClient {
      * @return a boolean indicating if the file was uploaded
      */
     public boolean sendFile(File file) {
-    	//TODO shouldn't this be file NOT exists?
         if (file == null || !file.exists()) {
             throw new IllegalArgumentException("Cannot find file to send");
         }
