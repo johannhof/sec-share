@@ -66,6 +66,6 @@ public class FileInfo implements Serializable {
 		return "Filename: " + this.filename + "\n\t" +
 				"Last Modified: " + this.lastModified  + "\n\t" + 
 				"Owner: " + this.owner  + "\n\t" +  
-				"Shared with: " +  sharesAux.toString() + "\n\n";
+				"Shared with: " +  sharesAux.toString();
 	}
 }
