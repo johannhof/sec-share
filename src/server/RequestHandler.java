@@ -1,6 +1,7 @@
 package server;
 
 import file_services.FileOperations;
+import message.LoginMessage;
 import message.Message;
 import message.PutMessage;
 import message.Reply;
@@ -30,6 +31,7 @@ public class RequestHandler implements Runnable {
 
     @Override
     public void run() {
+        UserManager userManager = UserManager.getInstance();
         try {
             boolean listen = true;
             InputStream inputStream = socket.getInputStream();
@@ -44,6 +46,8 @@ public class RequestHandler implements Runnable {
                         break;
                     case PUT:
                         System.out.println("PUT");
+                        assert message instanceof PutMessage;
+
                         PutMessage putMessage = (PutMessage) message;
                         File file = new File(this.serverDirectory, putMessage.getFilename());
 
@@ -63,7 +67,18 @@ public class RequestHandler implements Runnable {
                         System.out.println("LIST not implemented yet");
                         break;
                     case LOGIN:
-                        System.out.println("LOGIN not implemented yet");
+                        System.out.println("LOGIN");
+                        assert message instanceof LoginMessage;
+
+                        LoginMessage loginMessage = (LoginMessage) message;
+                        User user = userManager.findOrCreate(loginMessage.getUsername(), loginMessage.getPassword());
+
+                        if (user == null) {
+                            respond(new Reply(false), socket.getOutputStream());
+                        } else {
+                            respond(new Reply(true), socket.getOutputStream());
+                        }
+
                         break;
                     default:
                         System.out.println("wtf");

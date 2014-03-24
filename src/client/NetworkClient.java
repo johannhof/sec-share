@@ -1,10 +1,7 @@
 package client;
 
 import file_services.FileOperations;
-import message.ExitMessage;
-import message.Message;
-import message.PutMessage;
-import message.Reply;
+import message.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -44,9 +41,9 @@ public class NetworkClient {
 
     }
 
-    public boolean login(String password) {
-        //TODO
-        return true;
+    public boolean login(String username, String password) {
+        Reply reply = (Reply) msgSendReceive(new LoginMessage(username, password));
+        return reply.isSuccess();
     }
 
     public void disconnect() {
@@ -105,7 +102,7 @@ public class NetworkClient {
 
         // TODO isResult is probably not meant for this, right?
         // if the server allows the upload
-        if (reply.getResult()) {
+        if (reply.isSuccess()) {
             FileOperations.upload(file, outStream);
             return true;
         }

@@ -1,7 +1,5 @@
 package client;
 
-import file_services.FileOperations;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -75,7 +73,12 @@ public class SecShareClient {
 		NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]), CLIENT_HOME);
 
 		//TODO check user password?
-		netClient.login(password);
+		if (netClient.login(userID, password)) {
+			System.out.println("Logged in as" + userID);
+		} else {
+			System.err.println("Invalid Login");
+			System.exit(-1);
+		}
 
 		ServerStub mServerStub = new ServerStub(netClient);
 		SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub, CLIENT_HOME);

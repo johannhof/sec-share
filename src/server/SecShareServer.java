@@ -6,7 +6,8 @@ import java.net.ServerSocket;
 
 public class SecShareServer {
 
-    private static final String SERVER_REPO = "./serverdir";
+    public static final String SERVER_REPO = "./serverdir";
+
 
     public static void main(String[] args) {
 
