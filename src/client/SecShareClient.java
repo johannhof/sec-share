@@ -26,8 +26,11 @@ public class SecShareClient {
 
         //CL argument handling
         //TODO check filenames, organize better, be more thorough in checking for wrong CL options
-        //TODO -p OPTION NOT YET HANDLED
+        //TODO -p OPTION NOT YET HANDLED, has an extra argument
+        //TODO -l option NOT YET HANDLED, should only have 1 argument
         //TODO -l has no arguments
+        //TODO argument handling will assumed a list of files separated by spaces
+ 
         if (args.length >= 6) {
             if (args[0].equals("-u") && args[2].equals("-a")) {
 
