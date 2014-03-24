@@ -1,6 +1,6 @@
 package server;
 
-import file_services.SharedFile;
+import file_services.FileOperations;
 import message.Message;
 import message.PutMessage;
 import message.Reply;
@@ -45,7 +45,7 @@ public class RequestHandler implements Runnable {
                     case PUT:
                         System.out.println("PUT");
                         PutMessage putMessage = (PutMessage) message;
-                        SharedFile file = new SharedFile(this.serverDirectory, putMessage.getFilename());
+                        FileOperations file = new FileOperations(this.serverDirectory, putMessage.getFilename());
 
                         // if there is a younger file on the server
                         if (file.exists() && file.lastModified() > putMessage.getTimestamp()) {

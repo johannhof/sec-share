@@ -1,8 +1,9 @@
 package file_services;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class FileInfo {
+public class FileInfo implements Serializable{
 	
 	String filename;
 	long lastModified;

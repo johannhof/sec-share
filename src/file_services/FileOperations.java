@@ -6,36 +6,21 @@ import java.net.URI;
 /**
  * A File with the ability to download and upload.
  */
-public class SharedFile extends File {
+public class FileOperations {
 
-    public SharedFile(String pathname) {
-        super(pathname);
-    }
-
-    public SharedFile(String parent, String child) {
-        super(parent, child);
-    }
-
-    public SharedFile(File parent, String child) {
-        super(parent, child);
-    }
-
-    public SharedFile(URI uri) {
-        super(uri);
-    }
 
     /**
      * Uploads the file to the specified OutputStream.
      *
      * @param outputStream the stream to upload to
      */
-    public void upload(OutputStream outputStream) {
+    public static void upload(File file, OutputStream outputStream) {
         assert outputStream != null;
 
         BufferedInputStream bis = null;
         try {
-            byte[] mybytearray = new byte[(int) this.length()];
-            bis = new BufferedInputStream(new FileInputStream(this));
+            byte[] mybytearray = new byte[(int) file.length()];
+            bis = new BufferedInputStream(new FileInputStream(file));
             bis.read(mybytearray, 0, mybytearray.length);
             outputStream.write(mybytearray, 0, mybytearray.length);
             outputStream.flush();
@@ -58,7 +43,7 @@ public class SharedFile extends File {
      * @param inputStream the stream to load data from
      * @param filesize    number of bytes to load
      */
-    public void download(InputStream inputStream, long filesize) {
+    public static void download(InputStream inputStream, String filename, long filesize) {
         assert inputStream != null;
 
         byte[] buffer = new byte[1024];
@@ -69,7 +54,7 @@ public class SharedFile extends File {
         FileOutputStream fileOutputStream = null;
         BufferedInputStream bufferedInputStream = null;
         try {
-            fileOutputStream = new FileOutputStream(this);
+            fileOutputStream = new FileOutputStream(filename);
             bufferedInputStream = new BufferedInputStream(inputStream);
 
             while (aux > 0) {

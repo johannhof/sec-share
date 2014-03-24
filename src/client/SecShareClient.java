@@ -1,8 +1,9 @@
 package client;
 
-import file_services.SharedFile;
+import file_services.FileOperations;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class SecShareClient {
         String mode = null;
         String targetUser = null;
         //might want to use some other data structure
-        List<SharedFile> clientFiles = new ArrayList<>();
+        List<File> clientFiles = new ArrayList<>();
 
         //CL argument handling
         //TODO check filenames, organize better, be more thorough in checking for wrong CL options
@@ -39,10 +40,11 @@ public class SecShareClient {
                 serverAddress = args[3];
                 mode = args[4];
 
+                	//TODO change this to space
                 //how are filenames separated? assuming comma
                 for (String filename : args[5].split(",")) {
                     //check for exceptions
-                    clientFiles.add(new SharedFile(CLIENT_HOME, filename));
+                    //clientFiles.add(CLIENT_HOME, filename));
                 }
             }
         } else {
@@ -72,7 +74,7 @@ public class SecShareClient {
         //TODO missing a try catch or a check to see if addrss is properly formated
         String[] serverAddressAux = serverAddress.split(":");
 
-        NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]));
+        NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]), CLIENT_HOME);
 
         //TODO check user password?
         netClient.login(password);
