@@ -14,14 +14,14 @@ public class SecShareClient {
 
 
 	//SecShareClient -u <userId> -a <serverAddress> ( -c <filenames> | -p <userId> <filenames> | -g <filenames> | -s <filenames>)
-	public static void main(String[] args) {
+    public static void main(final String[] args) {
 
 		String userID = null;
 		String serverAddress = null;
 		String mode = null;
 		String targetUser = null;
 		//might want to use some other data structure
-		List<File> clientFiles = new ArrayList<>();
+        final List<File> clientFiles = new ArrayList<>();
 
 		//CL argument handling
 		//argument handling will assumed a list of files separated by spaces
@@ -39,18 +39,18 @@ public class SecShareClient {
 		}
 
 		//check and add the files and share target
-		if(mode != "-l"){
-			int i = 5;
+        if (!mode.equals("-l")) {
+            int i = 5;
 
 			//if it's a share
-			if(mode == "-p") {
-				targetUser = args[5];
+            if (mode.equals("-p")) {
+                targetUser = args[5];
 				i=6;
 			}
 			
 			//check files and add
 			while(i < args.length){
-                File file = new File(CLIENT_HOME, args[i]);
+                final File file = new File(CLIENT_HOME, args[i]);
 
                 if (!file.exists() || !file.isFile())
                     throw new IllegalArgumentException("File not found");
@@ -63,18 +63,18 @@ public class SecShareClient {
 		
 		//connect to the server
 		//TODO missing a try catch or a check to see if address is properly formated
-		String[] serverAddressAux = serverAddress.split(":");
+        final String[] serverAddressAux = serverAddress.split(":");
 
-		NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]), CLIENT_HOME);
+        final NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]), CLIENT_HOME);
 
 		//get user password
 		String password = null;
-		BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("Welcome to SecShare\n");
+        final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Welcome to SecShare\n");
 		System.out.println("Please enter your password");
 		try {
 			password = inputReader.readLine();
-		} catch (IOException e) {
+        } catch (final IOException e) {
 
 			e.printStackTrace();
 		}
@@ -91,13 +91,13 @@ public class SecShareClient {
 
 		try {
 			inputReader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+        } catch (final IOException e) {
+            e.printStackTrace();
 		}
 
 		//TODO possible problem with clientfiles beind null in case of -l
-		ServerStub mServerStub = new ServerStub(netClient);
-		SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub, CLIENT_HOME);
+        final ServerStub mServerStub = new ServerStub(netClient);
+        final SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub, CLIENT_HOME);
 
 		//main switch, manages operation mode
 		switch (mode) {
