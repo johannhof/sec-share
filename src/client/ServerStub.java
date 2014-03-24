@@ -28,7 +28,7 @@ public class ServerStub {
 	
 	//returns a boolean array which is the result of each share
 	//can only share files already on the server
-	public boolean[] shareFiles(List<File> files, String targetUser){
+	public boolean[] shareFiles(List<SharedFile> files, String targetUser){
 		//TODO must return error message if failed
 		
 		ArrayList<String> filenames = new ArrayList<String>();
@@ -43,7 +43,7 @@ public class ServerStub {
 		return reply.getResults();		
 	}
 	
-	//Datastructure for file management might be something other than pleb old list...
+	//TOOD Datastructure for file management might be something other than pleb old list...
 	public List<FileInfo> listFiles() {
 		
 		ListMessage request = new ListMessage(null);
@@ -53,6 +53,7 @@ public class ServerStub {
 		return reply.getFileInfo();
 	}
 
+	
     public boolean putFile(SharedFile file) {
         return networkClient.sendFile(file);
     }
@@ -63,9 +64,16 @@ public class ServerStub {
         return true;
     }
 
-    public boolean putFiles(List<SharedFile> files) {
-        files.forEach(this::putFile);
-        return true;
+    public boolean[] putFiles(List<SharedFile> files) {
+        
+    	//TODO same issue as file sharing this needs to have an order consistant wiht server processing, not a problem just a concern :P
+    	boolean[] replies = new boolean[files.size()];
+    	int i = 0;
+    	
+    	for(SharedFile file: files)
+    		replies[i++] = putFile(file);
+    		
+        return replies;
     }
 
     public boolean getFiles() {
@@ -74,9 +82,4 @@ public class ServerStub {
         return true;
     }
 
-    public boolean shareFile(File file, String targetUser){
-
-        // TODO
-        return true;
-    }
 }

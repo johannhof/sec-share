@@ -46,6 +46,8 @@ public class SecFileManager {
 	}
 
 	public void ShareFiles(String targetUser) {
+		myServer.shareFiles(userFiles, targetUser);
+		//TODO must display results, ok for shared done and error if fails for some reason
 		
 	}
 
