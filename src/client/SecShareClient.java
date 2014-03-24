@@ -50,10 +50,10 @@ public class SecShareClient {
 			
 			//check files and add
 			while(i < args.length){
-				File file = new File(args[i]);
-				
-				if(file == null || !file.exists() || !file.isFile())
-		            throw new IllegalArgumentException("File not found");
+                File file = new File(CLIENT_HOME, args[i]);
+
+                if (!file.exists() || !file.isFile())
+                    throw new IllegalArgumentException("File not found");
 				else
 					clientFiles.add(file);
 			}

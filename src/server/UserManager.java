@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserManager {
-    private static UserManager ourInstance = new UserManager();
+    private static final UserManager ourInstance = new UserManager();
 
     private List<User> users;
-    private File userFile;
+    private final File userFile;
 
     public static UserManager getInstance() {
         return ourInstance;
@@ -20,10 +20,10 @@ public class UserManager {
         userFile = new File(SecShareServer.SERVER_REPO, "users.xml");
         if (userFile.exists()) {
             try {
-                XMLDecoder d = new XMLDecoder(new BufferedInputStream(new FileInputStream(userFile)));
+                final XMLDecoder d = new XMLDecoder(new BufferedInputStream(new FileInputStream(userFile)));
                 users = (ArrayList<User>) d.readObject();
                 d.close();
-            } catch (FileNotFoundException e) {
+            } catch (final FileNotFoundException e) {
                 e.printStackTrace();
             }
         } else {
@@ -40,8 +40,8 @@ public class UserManager {
      * @param password user password
      * @return the matched user object if found, otherwise null!!
      */
-    public User findOrCreate(String name, String password) {
-        for (User u : users) {
+    public User findOrCreate(final String name, final String password) {
+        for (final User u : users) {
             if (u.getName().equals(name)) {
                 if (u.getPassword().equals(password)) {
                     return u;
@@ -50,7 +50,7 @@ public class UserManager {
             }
         }
 
-        User user = new User();
+        final User user = new User();
         user.setName(name);
         user.setPassword(password);
         users.add(user);
@@ -63,10 +63,10 @@ public class UserManager {
      */
     public void save() {
         try {
-            XMLEncoder e = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(userFile)));
+            final XMLEncoder e = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(userFile)));
             e.writeObject(users);
             e.close();
-        } catch (FileNotFoundException e1) {
+        } catch (final FileNotFoundException e1) {
             e1.printStackTrace();
         }
     }

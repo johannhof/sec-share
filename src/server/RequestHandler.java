@@ -1,5 +1,6 @@
 package server;
 
+import file_services.FileInfo;
 import file_services.FileOperations;
 import message.LoginMessage;
 import message.Message;
@@ -15,29 +16,30 @@ public class RequestHandler implements Runnable {
     private final Socket socket;
     private final File serverDirectory;
 
-    public RequestHandler(Socket socket, File serverDirectory) {
+    public RequestHandler(final Socket socket, final File serverDirectory) {
         System.out.println("New connection");
         this.socket = socket;
         this.serverDirectory = serverDirectory;
-        Thread thread = new Thread(this);
+        final Thread thread = new Thread(this);
         thread.run();
     }
 
-    private static void respond(Message message, OutputStream outputStream) throws IOException {
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+    private static void respond(final Message message, final OutputStream outputStream) throws IOException {
+        final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
         objectOutputStream.writeObject(message);
         objectOutputStream.flush();
     }
 
     @Override
     public void run() {
-        UserManager userManager = UserManager.getInstance();
+        final UserManager userManager = UserManager.getInstance();
+        User user = null;
         try {
             boolean listen = true;
-            InputStream inputStream = socket.getInputStream();
+            final InputStream inputStream = socket.getInputStream();
             while (listen) {
-                ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-                Message message = (Message) objectInputStream.readObject();
+                final ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                final Message message = (Message) objectInputStream.readObject();
 
                 switch (message.GetOp()) {
                     case EXIT:
@@ -46,32 +48,61 @@ public class RequestHandler implements Runnable {
                         break;
                     case PUT:
                         System.out.println("PUT");
+                        if (user == null) { // if not logged in
+                            respond(new Reply(false), socket.getOutputStream());
+                            break;
+                        }
+
                         assert message instanceof PutMessage;
 
-                        PutMessage putMessage = (PutMessage) message;
-                        File file = new File(this.serverDirectory, putMessage.getFilename());
+                        final PutMessage putMessage = (PutMessage) message;
+                        FileInfo fileInfo = user.findFile(putMessage.getFilename());
+                        final String filePath = this.serverDirectory + "/" + fileInfo.getOwner() + "/" + putMessage.getFilename();
 
-                        // if there is a younger file on the server
-                        if (file.exists() && file.lastModified() > putMessage.getTimestamp()) {
-                            respond(new Reply(false), socket.getOutputStream());
+                        // if the user has a file with this name in his list
+                        if (fileInfo != null) {
+                            final File file = new File(filePath);
+
+                            // if there is a younger file on the server, don't overwrite
+                            if (file.exists() && file.lastModified() > putMessage.getTimestamp()) {
+                                respond(new Reply(false), socket.getOutputStream());
+                            } else {
+                                respond(new Reply(true), socket.getOutputStream());
+                                FileOperations.download(inputStream, filePath, putMessage.getFilesize());
+                            }
                         } else {
+                            // create a new file with the user as owner
+                            fileInfo = new FileInfo();
+                            fileInfo.setFilename(putMessage.getFilename());
+                            fileInfo.setOwner(user.getName());
+                            user.addFile(fileInfo);
+                            userManager.save();
+
                             respond(new Reply(true), socket.getOutputStream());
-                            FileOperations.download(inputStream, putMessage.getFilename(), putMessage.getFilesize());
+                            FileOperations.download(inputStream, filePath, putMessage.getFilesize());
                         }
 
                         break;
                     case GET:
                         System.out.println("GET not implemented yet");
+                        if (user == null) { // if not logged in
+                            respond(new Reply(false), socket.getOutputStream());
+                            break;
+                        }
                         break;
                     case LIST:
                         System.out.println("LIST not implemented yet");
+                        if (user == null) { // if not logged in
+                            respond(new Reply(false), socket.getOutputStream());
+                            break;
+                        }
                         break;
                     case LOGIN:
                         System.out.println("LOGIN");
                         assert message instanceof LoginMessage;
 
-                        LoginMessage loginMessage = (LoginMessage) message;
-                        User user = userManager.findOrCreate(loginMessage.getUsername(), loginMessage.getPassword());
+                        final LoginMessage loginMessage = (LoginMessage) message;
+                        user = userManager.findOrCreate(loginMessage.getUsername(), loginMessage.getPassword());
 
                         if (user == null) {
                             respond(new Reply(false), socket.getOutputStream());

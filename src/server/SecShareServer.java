@@ -9,7 +9,7 @@ public class SecShareServer {
     public static final String SERVER_REPO = "./serverdir";
 
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
         int port = 0;
 
@@ -26,20 +26,20 @@ public class SecShareServer {
         }
 
         //setup
-        File serverDirectory = new File(SERVER_REPO);
+        final File serverDirectory = new File(SERVER_REPO);
         boolean listening = true;
 
         System.out.println("Welcome to SecShare\n");
 
         //open server socket
         try {
-            ServerSocket serverSocket = new ServerSocket(port);
+            final ServerSocket serverSocket = new ServerSocket(port);
 
             //start listening for incoming requests
             while (listening)
                 new RequestHandler(serverSocket.accept(), serverDirectory).run();
 
-        } catch (IOException ioe1) {
+        } catch (final IOException ioe1) {
             System.out.println("Error while trying to listen on port: " + port);
             ioe1.printStackTrace();
             System.exit(-1);

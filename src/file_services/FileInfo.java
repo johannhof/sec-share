@@ -13,7 +13,7 @@ public class FileInfo implements Serializable {
     String owner;
     List<String> shares;
 
-    public FileInfo(String filename, long lastModified, String owner, List<String> shares) {
+    public FileInfo(final String filename, final long lastModified, final String owner, final List<String> shares) {
         this.filename = filename;
         this.lastModified = lastModified;
         this.owner = owner;
@@ -28,7 +28,7 @@ public class FileInfo implements Serializable {
         return filename;
     }
 
-    public void setFilename(String filename) {
+    public void setFilename(final String filename) {
         this.filename = filename;
     }
 
@@ -36,7 +36,7 @@ public class FileInfo implements Serializable {
         return lastModified;
     }
 
-    public void setLastModified(long lastModified) {
+    public void setLastModified(final long lastModified) {
         this.lastModified = lastModified;
     }
 
@@ -44,7 +44,7 @@ public class FileInfo implements Serializable {
         return owner;
     }
 
-    public void setOwner(String owner) {
+    public void setOwner(final String owner) {
         this.owner = owner;
     }
 
@@ -52,20 +52,20 @@ public class FileInfo implements Serializable {
         return shares;
     }
 
-    public void setShares(List<String> shares) {
+    public void setShares(final List<String> shares) {
         this.shares = shares;
     }
 
-	@Override
-	public String toString() {
-		
-		StringBuilder sharesAux = new StringBuilder();
-		for(String st : this.shares)
-			sharesAux.append(st + " ");
-		
-		return "Filename: " + this.filename + "\n\t" +
-				"Last Modified: " + this.lastModified  + "\n\t" + 
-				"Owner: " + this.owner  + "\n\t" +  
-				"Shared with: " +  sharesAux.toString();
-	}
+    @Override
+    public String toString() {
+
+        final StringBuilder sharesAux = new StringBuilder();
+        for (final String st : this.shares)
+            sharesAux.append(st).append(" ");
+
+        return "Filename: " + this.filename + "\n\t" +
+                "Last Modified: " + this.lastModified + "\n\t" +
+                "Owner: " + this.owner + "\n\t" +
+                "Shared with: " + sharesAux.toString();
+    }
 }

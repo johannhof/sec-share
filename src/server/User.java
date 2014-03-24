@@ -18,7 +18,7 @@ public class User implements Serializable {
         this.files = new ArrayList<>();
     }
 
-    public void setFiles(List<FileInfo> files) {
+    public void setFiles(final List<FileInfo> files) {
         this.files = files;
     }
 
@@ -26,7 +26,7 @@ public class User implements Serializable {
         return files;
     }
 
-    public void addFile(FileInfo file) {
+    public void addFile(final FileInfo file) {
         files.add(file);
     }
 
@@ -34,7 +34,7 @@ public class User implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -42,7 +42,16 @@ public class User implements Serializable {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
+    }
+
+    public FileInfo findFile(final String name) {
+        for (final FileInfo fileInfo : this.files) {
+            if (fileInfo.getFilename().equals(name)) {
+                return fileInfo;
+            }
+        }
+        return null;
     }
 }
