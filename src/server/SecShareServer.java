@@ -6,7 +6,7 @@ import java.net.ServerSocket;
 
 public class SecShareServer {
 
-    private static final String SERVER_REPO = "";
+    private static final String SERVER_REPO = "./";
     //static port or received from CL arguments? WTH?
     //private static final int SERVER_PORT = 23456;
 

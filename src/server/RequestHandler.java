@@ -1,12 +1,11 @@
 package server;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.net.Socket;
-
 import message.Message;
+import message.PutMessage;
+import message.Reply;
+
+import java.io.*;
+import java.net.Socket;
 
 public class RequestHandler implements Runnable {
 
@@ -21,6 +20,12 @@ public class RequestHandler implements Runnable {
         thread.run();
     }
 
+    private static void respond(Message message, OutputStream outputStream) throws IOException {
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        objectOutputStream.writeObject(message);
+        objectOutputStream.flush();
+    }
+
     @Override
     public void run() {
         try {
@@ -32,8 +37,32 @@ public class RequestHandler implements Runnable {
 
                 switch (message.GetOp()) {
                     case EXIT:
-                        listen = false;
                         System.out.println("EXIT");
+                        listen = false;
+                        break;
+                    case PUT:
+                        System.out.println("PUT");
+                        PutMessage putMessage = (PutMessage) message;
+                        SharedFile file = new SharedFile(this.serverDirectory, putMessage.getFilename());
+
+                        // if there is a younger file on the server
+                        if (file.exists() && file.lastModified() > putMessage.getTimestamp()) {
+                            respond(new Reply(false), socket.getOutputStream());
+                        } else {
+                            respond(new Reply(true), socket.getOutputStream());
+                            file.put(inputStream, putMessage.getFilesize());
+                        }
+
+                        break;
+                    case GET:
+                        System.out.println("GET not implemented yet");
+                        break;
+                    case LIST:
+                        System.out.println("LIST not implemented yet");
+                        break;
+                    case LOGIN:
+                        System.out.println("LOGIN not implemented yet");
+                        break;
                     default:
                         System.out.println("wtf");
                 }

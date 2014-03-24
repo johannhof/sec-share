@@ -34,11 +34,13 @@ public class SecFileManager {
 	public void SyncFiles(int syncTimer) {
 
 		boolean running = true;
-		
-		while(running)
-			
-				//every 30 synctimer seconds list compare upload download
-		//TODO SYNC, must open some user input stream to read commands to stop
+
+        while (running) {
+
+        }
+
+        //every 30 synctimer seconds list compare upload download
+        //TODO SYNC, must open some user input stream to read commands to stop
 	}
 
 	public void ShareFiles(String targetUser) {
