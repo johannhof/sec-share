@@ -1,5 +1,6 @@
 package client;
 
+import file_services.FileInfo;
 import file_services.FileOperations;
 
 import java.io.File;
@@ -20,35 +21,47 @@ public class SecFileManager {
 
 	public void uploadAll() {
 		myServer.putFiles(userFiles);
-		//TODO get and print error messages if this failed
+		System.out.println(" +++ Files copied to server +++ ");
 	}
 
 	public void downloadAll() {
-		myServer.getFiles();
-		//TODO add new files that were shared to my file list or is this done with list?
+		myServer.getFiles(userFiles);
+		System.out.println(" +++ Files copied from server +++ ");
 	}
 
 	public void listFiles() {
-		myServer.listFiles();
-		//TODO must add new files to the file list AND display the information
+		List<FileInfo> result = myServer.listFiles();
+		System.out.println(" +++ File list: +++ ");
+		for(FileInfo fi : result)
+			System.out.println(result.toString() + "\n\n");		
 	}
 
-	public void SyncFiles(int syncTimer) {
-
-		boolean running = true;
-
-        while (running) {
-
-        }
-
-        //every 30 synctimer seconds list compare upload download
-        //TODO SYNC, must open some user input stream to read commands to stop
-	}
-
+	//TODO CAREFUL with array / list size and order
 	public void ShareFiles(String targetUser) {
-		myServer.shareFiles(userFiles, targetUser);
-		//TODO must display results, ok for shared done and error if fails for some reason
-		
+		boolean[] result = myServer.shareFiles(userFiles, targetUser);
+
+		int i=0;
+		for(File file : userFiles){
+			if(result[i] == true)
+				System.out.println("+ Sharing " + file.getName() + " complete");
+			else
+				System.out.println("+ Sharing " + file.getName() + " FAILED");
+			i++;
+		}
+		System.out.println(" +++ File sharing complete +++ ");		
 	}
+	
+	//TODO
+	public void SyncFiles(int syncTimer) {
+		//TODO PROBLEM: WHEN getting a file, it has to replace old file if exists or create a new one then add to client list if it is a new share received
+				boolean running = true;
+
+		        while (running) {
+
+		        }
+
+		        //every 30 synctimer seconds list compare upload download
+		        //TODO SYNC, must open some user input stream to read commands to stop
+			}
 
 }

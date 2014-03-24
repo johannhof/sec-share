@@ -16,6 +16,7 @@ public class ServerStub {
     //typical methods here will be download file, get file
     //the idea is that the file manager never has to deal with messages just the required content	
 	//methods might be to be oveloaded to provide option of merely passing filename
+	//TOOD Datastructure for file management might be something other than pleb old list...
 	
 	NetworkClient networkClient;
 	
@@ -27,8 +28,7 @@ public class ServerStub {
 	//returns a boolean array which is the result of each share
 	//can only share files already on the server
 	public boolean[] shareFiles(List<File> files, String targetUser){
-		//TODO must return error message if failed
-		
+
 		ArrayList<String> filenames = new ArrayList<String>();
 		
 		for(File f : files)
@@ -41,7 +41,7 @@ public class ServerStub {
 		return reply.getResults();		
 	}
 	
-	//TOOD Datastructure for file management might be something other than pleb old list...
+
 	public List<FileInfo> listFiles() {
 		
 		ListMessage request = new ListMessage(null);
@@ -74,7 +74,7 @@ public class ServerStub {
         return replies;
     }
 
-    public boolean getFiles() {
+    public boolean getFiles(List<File> files) {
 
         // TODO
         return true;
