@@ -2,7 +2,10 @@ package client;
 
 import file_services.FileInfo;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +64,9 @@ public class SecFileManager {
 		boolean running = true;
 		String input;
 
+		InputStreamReader isr = new InputStreamReader(System.in);
+		BufferedReader inputReader = new BufferedReader(isr);
+
 		System.out.println(" +++ File Synchronization Starting +++ ");		
 		System.out.println("");
 		System.out.println("Available commands: ");
@@ -69,13 +75,51 @@ public class SecFileManager {
 		while (running) {
 
 			System.out.println(" + New sync cycle + ");
-			//TODO split the uploads / downloads timewise			
 
 			//get server file list
-
 			Map<String, String> fileOps = getFileSyncRequiredOperations(myServer.listFiles());
-		}
 
+			//execute required file operations
+			for(String name : fileOps.keySet()) {
+
+				try {
+					//TODO split the uploads / downloads timewise by diving syncTimer / fileOps.size() fixed 10 milisec sleep atm			
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+				String op = fileOps.get(name);
+				if(op == "put")
+					myServer.putFile(new File(name));
+				else if (op == "get")
+					myServer.getFile(new File(name));
+			}
+			
+			//sleep for syncTimer
+			try {
+				Thread.sleep(syncTimer * 1000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+			
+			System.out.println("Directory sync cycle ended\n");
+
+			//get input
+			try {
+				if( inputReader.ready()){
+
+					input = inputReader.readLine();
+
+					if(input.compareToIgnoreCase("exit") == 0)
+						running = false;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+		//TODO is this returning to main and exiting correctly?
 		//every 30 synctimer seconds list compare upload download
 		//TODO SYNC, must open some user input stream to read commands to stop
 	}
