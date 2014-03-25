@@ -54,18 +54,11 @@ public class SecFileManager {
     }
 
     public void SyncFiles(final int syncTimer) {
-        boolean running = true;
-        String input;
-
         System.out.println(" +++ File Synchronization Starting +++ ");
-        System.out.println("");
-        System.out.println("Available commands: ");
-        System.out.println("\"exit\" - to stop and exit the program");
         //main sync cycle
-        while (running) {
+        while (true) {
 
             System.out.println(" + New sync cycle + ");
-            Scanner in = new Scanner(System.in);
 
             //get server file list
             final Map<String, String> fileOps = getFileSyncRequiredOperations(myServer.listFiles(), userFiles.size() < 1);
@@ -87,7 +80,7 @@ public class SecFileManager {
                     myServer.getFile(new SharedFile(clientHome, fileName));
             }
 
-            System.out.println("Directory sync cycle ended\n");
+            System.out.println(" + Sync cycle ended + \n");
 
             //sleep for syncTimer
             try {
@@ -95,32 +88,7 @@ public class SecFileManager {
             } catch (final InterruptedException e1) {
                 e1.printStackTrace();
             }
-
-            //get input
-//            try {
-
-//                final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("what");
-            if (in.hasNext()) {
-
-                System.out.println("whatever");
-                input = in.nextLine();
-
-                if (input.compareToIgnoreCase("exit") == 0)
-                    running = false;
-            }
-//            } catch (final IOException e) {
-//                e.printStackTrace();
-//            }
-
-
         }
-
-//        try {
-//            inputReader.close();
-//        } catch (final IOException e) {
-//            e.printStackTrace();
-//        }
 
         //TODO is this returning to main and exiting correctly?
         //every 30 synctimer seconds list compare upload download
@@ -202,8 +170,8 @@ public class SecFileManager {
                     result.put(name, "get");
                 }
 
-                // else both have the same timestamp
-                // do nothing
+                //both have the same timestamp
+                //do nothing
             }
         }
 
