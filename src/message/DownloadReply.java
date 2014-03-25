@@ -8,7 +8,7 @@ public class DownloadReply extends Reply {
         return timestamp;
     }
 
-    public DownloadReply(boolean success, long filesize, long timestamp) {
+    public DownloadReply(final boolean success, final long filesize, final long timestamp) {
         super(success, filesize);
         this.timestamp = timestamp;
     }
