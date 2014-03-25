@@ -3,8 +3,14 @@ package client;
 import file_services.FileInfo;
 import file_services.SharedFile;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 //This class implements the core file operations so they aren't all stacked up on main
 public class SecFileManager {
@@ -57,21 +63,62 @@ public class SecFileManager {
         final boolean running = true;
         String input;
 
-        System.out.println(" +++ File Synchronization Starting +++ ");
-        System.out.println("");
+		InputStreamReader isr = new InputStreamReader(System.in);
+		BufferedReader inputReader = new BufferedReader(isr);
+
+		System.out.println(" +++ File Synchronization Starting +++ ");		
+		System.out.println("");
 		System.out.println("Available commands: ");
 		System.out.println("\"exit\" - to stop and exit the program");
 		//main sync cycle
 		while (running) {
 
 			System.out.println(" + New sync cycle + ");
-            //TODO split the uploads / downloads timewise
 
 			//get server file list
+			Map<String, String> fileOps = getFileSyncRequiredOperations(myServer.listFiles());
 
-            final Map<String, String> fileOps = getFileSyncRequiredOperations(myServer.listFiles());
-        }
+			//execute required file operations
+			for(String name : fileOps.keySet()) {
 
+				try {
+					//TODO split the uploads / downloads timewise by diving syncTimer / fileOps.size() fixed 10 milisec sleep atm			
+					Thread.sleep(10);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+				String op = fileOps.get(name);
+				if(op == "put")
+					myServer.putFile(new File(name));
+				else if (op == "get")
+					myServer.getFile(new File(name));
+			}
+			
+			//sleep for syncTimer
+			try {
+				Thread.sleep(syncTimer * 1000);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+			
+			System.out.println("Directory sync cycle ended\n");
+
+			//get input
+			try {
+				if( inputReader.ready()){
+
+					input = inputReader.readLine();
+
+					if(input.compareToIgnoreCase("exit") == 0)
+						running = false;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+		//TODO is this returning to main and exiting correctly?
 		//every 30 synctimer seconds list compare upload download
 		//TODO SYNC, must open some user input stream to read commands to stop
 	}
