@@ -3,24 +3,23 @@ package file_services;
 import java.io.*;
 import java.nio.file.Paths;
 
+/**
+ * A Standard File with extended sharing functionality
+ */
 public class SharedFile extends File {
 
     private final String base;
 
+    /**
+     * Creates a new Shared file, the provided base needs to be the root path of the client
+     * (the directory where the user keeps his files to share)
+     *
+     * @param base client base path
+     * @param path specific file path, should include all subdirectories from the base path
+     */
     public SharedFile(final String base, final String path) {
         super(base, path);
         this.base = new File(base).getAbsolutePath();
-    }
-
-    /**
-     * Makes the path relative to the provided base path.
-     *
-     * @param path the path to relativize
-     * @param base the base directory
-     * @return the relative path
-     */
-    private static String relativePath(final String path, final String base) {
-        return Paths.get(base).relativize(Paths.get(path)).toString();
     }
 
     /**

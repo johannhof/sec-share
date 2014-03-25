@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Information about a file to be passed around.
+ */
 public class FileInfo implements Serializable {
 
     private static final long serialVersionUID = -3406088714131942956L;

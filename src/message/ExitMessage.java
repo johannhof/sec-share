@@ -2,13 +2,10 @@ package message;
 
 public class ExitMessage extends Message {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1330733010051438698L;
+    private static final long serialVersionUID = -1330733010051438698L;
 
-	public ExitMessage() {
-		super(OpCode.EXIT);
-	}
+    public ExitMessage() {
+        super(OpCode.EXIT);
+    }
 
 }

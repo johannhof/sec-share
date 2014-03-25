@@ -1,15 +1,15 @@
 package message;
 
-import java.util.List;
-
 import file_services.FileInfo;
+
+import java.util.List;
 
 public class ListMessage extends Message{
 
-	private List<FileInfo> fileInfo;
-		
-	public ListMessage(List<FileInfo> fileInfo) {
-		super(OpCode.LIST);
+    private final List<FileInfo> fileInfo;
+
+    public ListMessage(final List<FileInfo> fileInfo) {
+        super(OpCode.LIST);
 		this.fileInfo = fileInfo;
 	}
 

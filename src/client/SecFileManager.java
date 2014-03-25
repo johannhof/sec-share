@@ -6,7 +6,9 @@ import file_services.SharedFile;
 import java.io.File;
 import java.util.*;
 
-//This class implements the core file operations so they aren't all stacked up on main
+/**
+ * This class implements the core file operations
+ */
 public class SecFileManager {
 
     private final List<SharedFile> userFiles;
@@ -51,9 +53,7 @@ public class SecFileManager {
         System.out.println(" +++ File sharing complete +++ ");
     }
 
-    //TODO
     public void SyncFiles(final int syncTimer) {
-        //TODO PROBLEM: WHEN getting a file, it has to replace old file if exists or create a new one then add to client list if it is a new share received
         boolean running = true;
         String input;
 
@@ -106,9 +106,9 @@ public class SecFileManager {
                 System.out.println("whatever");
                 input = in.nextLine();
 
-                    if (input.compareToIgnoreCase("exit") == 0)
-                        running = false;
-                }
+                if (input.compareToIgnoreCase("exit") == 0)
+                    running = false;
+            }
 //            } catch (final IOException e) {
 //                e.printStackTrace();
 //            }
@@ -202,8 +202,8 @@ public class SecFileManager {
                     result.put(name, "get");
                 }
 
-                //both have the same timestamp
-                //do nothing
+                // else both have the same timestamp
+                // do nothing
             }
         }
 
