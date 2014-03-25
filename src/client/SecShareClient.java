@@ -41,7 +41,6 @@ public class SecShareClient {
                     "SecShareClient -u <userId> -a <serverAddress> ( -c <filenames> | -p <userId> <filenames> | -g <filenames> | -s <filenames>)");
         }
 
-        System.out.println("Welcome to SecShare\n");
         //check and add the files and share target
         if (!mode.equals("-l")) {
             int i = 5;
@@ -58,8 +57,6 @@ public class SecShareClient {
                 clientFiles.add(file);
             }
         }
-
-        System.out.println("Welcome to SecShare\n");
 
         // parse address
         // TODO this probably fails in case of http://localhost:3000
@@ -94,7 +91,7 @@ public class SecShareClient {
 
             // check with server
             if (netClient.login(userID, password)) {
-                System.out.println("Logged in as" + userID);
+                System.out.println("Logged in as " + userID);
                 break;
             } else {
                 System.out.println("Sorry. Try again.");
