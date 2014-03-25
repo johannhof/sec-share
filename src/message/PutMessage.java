@@ -1,14 +1,14 @@
 package message;
 
-import java.io.File;
+import file_services.SharedFile;
 
 public class PutMessage extends Message {
 
-    private String filename;
-    private long filesize;
-    private long timestamp;
+    private final String filename;
+    private final long filesize;
+    private final long timestamp;
 
-    public PutMessage(File file) {
+    public PutMessage(final SharedFile file) {
         super(OpCode.PUT);
         this.filename = file.getName();
         this.filesize = file.length();

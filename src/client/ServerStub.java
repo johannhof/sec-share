@@ -1,11 +1,11 @@
 package client;
 
 import file_services.FileInfo;
+import file_services.SharedFile;
 import message.ListMessage;
 import message.Reply;
 import message.ShareMessage;
 
-import java.io.File;
 import java.util.List;
 
 public class ServerStub {
@@ -22,8 +22,8 @@ public class ServerStub {
 		this.networkClient = networkClient;
 	}
 
-	public boolean shareFile(final File file, final String targetUser) {
-		final ShareMessage request = new ShareMessage(file.getName(), targetUser);
+    public boolean shareFile(final SharedFile file, final String targetUser) {
+        final ShareMessage request = new ShareMessage(file.getName(), targetUser);
 		final Reply reply = (Reply) networkClient.msgSendReceive(request);
 		if (reply.isSuccess()) {
 			return true;
@@ -42,30 +42,30 @@ public class ServerStub {
 		return reply.getFileInfo();
 	}
 
-	public boolean putFile(final File file) {
-		return networkClient.sendFile(file);
+    public boolean putFile(final SharedFile file) {
+        return networkClient.sendFile(file);
 	}
 
-	public boolean getFile(final File file) {
-		return networkClient.receiveFile(file);
+    public boolean getFile(final SharedFile file) {
+        return networkClient.receiveFile(file);
 	}
 
-	public boolean[] putFiles(final List<File> files) {
+    public boolean[] putFiles(final List<SharedFile> files) {
 
 		//TODO same issue as file sharing this needs to have an order consistant wiht server processing, not a problem just a concern :P
 		final boolean[] replies = new boolean[files.size()];
 		int i = 0;
 
-		for (final File file : files)
-			replies[i++] = putFile(file);
+        for (final SharedFile file : files)
+            replies[i++] = putFile(file);
 
 		return replies;
 	}
 
-	public boolean getFiles(final List<File> files) {
-		
-		for(File f : files)
-			getFile(f);
+    public boolean getFiles(final List<SharedFile> files) {
+
+        for (SharedFile f : files)
+            getFile(f);
 
 		return true;
 	}

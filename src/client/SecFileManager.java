@@ -1,30 +1,25 @@
 package client;
 
 import file_services.FileInfo;
+import file_services.SharedFile;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 //This class implements the core file operations so they aren't all stacked up on main
 public class SecFileManager {
 
-	private List<File> userFiles;
-	private ServerStub myServer;
-	private File clientHome;
+    private final List<SharedFile> userFiles;
+    private final ServerStub myServer;
+    private String clientHome;
 
-	public SecFileManager(List<File> clientFiles, final ServerStub server, final String clientHome) {
-		this.userFiles = clientFiles;
+    public SecFileManager(final List<SharedFile> clientFiles, final ServerStub server, final String clientHome) {
+        this.userFiles = clientFiles;
 		this.myServer = server;
-		this.clientHome = new File(clientHome);
-	}
+        this.clientHome = clientHome;
+    }
 
 	public void uploadAll() {
 		myServer.putFiles(userFiles);
@@ -48,8 +43,8 @@ public class SecFileManager {
 	}
 
 	public void ShareFiles(final String targetUser) {
-		for (final File file : userFiles) {
-			if (myServer.shareFile(file, targetUser)) {
+        for (final SharedFile file : userFiles) {
+            if (myServer.shareFile(file, targetUser)) {
 				System.out.println("+ Sharing " + file.getName() + " complete");
 			} else {
 				System.out.println("+ Sharing " + file.getName() + " FAILED");
@@ -59,13 +54,13 @@ public class SecFileManager {
 	}
 
 	//TODO
-	public void SyncFiles(int syncTimer) {
-		//TODO PROBLEM: WHEN getting a file, it has to replace old file if exists or create a new one then add to client list if it is a new share received
-		boolean running = true;
-		String input;
+    public void SyncFiles(final int syncTimer) {
+        //TODO PROBLEM: WHEN getting a file, it has to replace old file if exists or create a new one then add to client list if it is a new share received
+        boolean running = true;
+        String input;
 
-		InputStreamReader isr = new InputStreamReader(System.in);
-		BufferedReader inputReader = new BufferedReader(isr);
+        final InputStreamReader isr = new InputStreamReader(System.in);
+        final BufferedReader inputReader = new BufferedReader(isr);
 
 		System.out.println(" +++ File Synchronization Starting +++ ");		
 		System.out.println("");
@@ -77,30 +72,30 @@ public class SecFileManager {
 			System.out.println(" + New sync cycle + ");
 
 			//get server file list
-			Map<String, String> fileOps = getFileSyncRequiredOperations(myServer.listFiles());
+            final Map<String, String> fileOps = getFileSyncRequiredOperations(myServer.listFiles());
 
 			//execute required file operations
-			for(String name : fileOps.keySet()) {
+            for (final String fileName : fileOps.keySet()) {
 
 				try {
 					//TODO split the uploads / downloads timewise by diving syncTimer / fileOps.size() fixed 10 milisec sleep atm			
 					Thread.sleep(10);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+                } catch (final InterruptedException e) {
+                    e.printStackTrace();
 				}
 
-				String op = fileOps.get(name);
-				if(op == "put")
-					myServer.putFile(new File(name));
-				else if (op == "get")
-					myServer.getFile(new File(name));
-			}
+                final String op = fileOps.get(fileName);
+                if (op.equals("put"))
+                    myServer.putFile(new SharedFile(clientHome, fileName));
+                else if (op.equals("get"))
+                    myServer.getFile(new SharedFile(clientHome, fileName));
+            }
 			
 			//sleep for syncTimer
 			try {
 				Thread.sleep(syncTimer * 1000);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
+            } catch (final InterruptedException e1) {
+                e1.printStackTrace();
 			}
 			
 			System.out.println("Directory sync cycle ended\n");
@@ -114,8 +109,8 @@ public class SecFileManager {
 					if(input.compareToIgnoreCase("exit") == 0)
 						running = false;
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
+            } catch (final IOException e) {
+                e.printStackTrace();
 			}
 
 		}
@@ -126,33 +121,32 @@ public class SecFileManager {
 
 	//TODO might need to add checks for lists not being empty
 	//what a terrible name for a method
-	private Map<String, String> getFileSyncRequiredOperations(List<FileInfo> serverFiles) {
+    private Map<String, String> getFileSyncRequiredOperations(final List<FileInfo> serverFiles) {
 
 		//sets to contain file data
-		HashMap<String, Long> localFileData = new HashMap<String, Long>();
-		HashMap<String, Long> remoteFileData = new HashMap<String, Long>();
+        final HashMap<String, Long> localFileData = new HashMap<>();
+        final HashMap<String, Long> remoteFileData = new HashMap<>();
 
 		//unique filenames from local and server
-		Set<String> distinctFilenames = new HashSet<String>();
+        final Set<String> distinctFilenames = new HashSet<>();
 
 		//results to return map of filename plus operation Map<filename, operation>
-		Map<String, String> result = new HashMap<String, String>();
-
+        final Map<String, String> result = new HashMap<>();
 
 		//add local data to map and set
-		for(File f : userFiles){
-			localFileData.put(f.getName(), f.lastModified());	
-			distinctFilenames.add(f.getName());
+        for (final SharedFile f : userFiles) {
+            localFileData.put(f.getName(), f.lastModified());
+            distinctFilenames.add(f.getName());
 		}
 
 		//add remote data to map and set
-		for(FileInfo fi : serverFiles){
-			localFileData.put(fi.getFilename(), fi.getLastModified());
-			distinctFilenames.add(fi.getFilename());
+        for (final FileInfo fi : serverFiles) {
+            remoteFileData.put(fi.getFilename(), fi.getLastModified());
+            distinctFilenames.add(fi.getFilename());
 		}
 
-		//main method cycle 
-		for(String name : distinctFilenames){
+        //main method cycle
+        for (final String name : distinctFilenames) {
 
 			//if the file isn't on the local list
 			if(!localFileData.containsKey(name)){
@@ -164,16 +158,18 @@ public class SecFileManager {
 			}
 			//general case where the file is on both
 			else {
-				long localTime = localFileData.get(name);
-				long remoteTime = localFileData.get(name);
+                final long localTime = localFileData.get(name);
+                final long remoteTime = remoteFileData.get(name);
 
 				//file is more recent on the client
-				if(localTime > remoteTime)
-					result.put(name,"put");
+                if (localTime > remoteTime) {
+                    result.put(name, "put");
+                }
 
 				//file is more recent on the server
-				else if(remoteTime > localTime)
-					result.put(name,"get");
+                else if (remoteTime > localTime) {
+                    result.put(name, "get");
+                }
 
 				//both have the same timestamp
 				//do nothing
