@@ -25,7 +25,7 @@ public class SecShareClient {
 
         //CL argument handling
         //argument handling will assumed a list of files separated by spaces
-        //TODO allow any argument order?
+        //TODO allow any argument order?..better CL processing
 
         if ((args.length >= 5) && args[0].equals("-u") && args[2].equals("-a")) {
 
@@ -37,7 +37,7 @@ public class SecShareClient {
         } else {
             throw new IllegalArgumentException("Invalid command line arguments \n\t " +
                     "Execution options:\n\t " +
-                    "SecShareClient -u <userId> -a <serverAddress> ( -c <filenames> | -p <userId> <filenames> | -g <filenames> | -s <filenames>)");
+                    "SecShareClient -u <userId> -a <serverAddress> ( -c <filenames> | -p <userId> <filenames> | -g <filenames> | -s [<filenames>] )");
         }
 
         System.out.println("Welcome to SecShare\n");
@@ -56,6 +56,7 @@ public class SecShareClient {
                 final File file = new File(CLIENT_HOME, args[i++]);
                 clientFiles.add(file);
             }
+            
         }
 
         System.out.println("Welcome to SecShare\n");
