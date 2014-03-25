@@ -2,11 +2,10 @@ package client;
 
 import file_services.FileInfo;
 import message.ListMessage;
-import message.MultiReply;
+import message.Reply;
 import message.ShareMessage;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ServerStub {
@@ -22,23 +21,17 @@ public class ServerStub {
     public ServerStub(final NetworkClient networkClient) {
         this.networkClient = networkClient;
 	}
-	
-	//returns a boolean array which is the result of each share
-	//can only share files already on the server
-    public boolean[] shareFiles(final List<File> files, final String targetUser) {
 
-        final ArrayList<String> filenames = new ArrayList<>();
-
-        for (final File f : files)
-            filenames.add(f.getName());
-
-        final ShareMessage request = new ShareMessage(filenames, targetUser);
-        final MultiReply reply = (MultiReply) networkClient.msgSendReceive(request);
-
-        //TODO careful with the order, the server must return the replies in the same order as the requests otherwise must add a filename list to multireply
-		return reply.getResults();		
-	}
-	
+    public boolean shareFile(final File file, final String targetUser) {
+        final ShareMessage request = new ShareMessage(file.getName(), targetUser);
+        final Reply reply = (Reply) networkClient.msgSendReceive(request);
+        if (reply.isSuccess()) {
+            return true;
+        } else {
+            System.err.println(reply.getMessage());
+            return false;
+        }
+    }
 
 	public List<FileInfo> listFiles() {
 
@@ -48,7 +41,6 @@ public class ServerStub {
 
         return reply.getFileInfo();
 	}
-
 
     public boolean putFile(final File file) {
         return networkClient.sendFile(file);

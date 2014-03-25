@@ -12,7 +12,6 @@ public class NetworkClient {
     String userID;
     OutputStream outStream;
     InputStream inStream;
-    String clientHome;
 
     public NetworkClient(final String userID, final String host, final int port, final String clientHome) {
 

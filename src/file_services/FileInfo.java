@@ -68,4 +68,24 @@ public class FileInfo implements Serializable {
                 "Owner: " + this.owner + "\n\t" +
                 "Shared with: " + sharesAux.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FileInfo fileInfo = (FileInfo) o;
+
+        if (filename != null ? !filename.equals(fileInfo.filename) : fileInfo.filename != null) return false;
+        if (owner != null ? !owner.equals(fileInfo.owner) : fileInfo.owner != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = filename != null ? filename.hashCode() : 0;
+        result = 31 * result + (owner != null ? owner.hashCode() : 0);
+        return result;
+    }
 }

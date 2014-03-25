@@ -63,6 +63,22 @@ public class UserManager {
     }
 
     /**
+     * Finds the specified user by name, ignoring the password
+     * returns null if a user with the name does not exist
+     *
+     * @param name name of the user
+     * @return the matched user object if found, otherwise null!!
+     */
+    public User find(final String name) {
+        for (final User u : users) {
+            if (u.getName().equals(name)) {
+                return u;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Persists the user list to the disk.
      */
     public void save() {

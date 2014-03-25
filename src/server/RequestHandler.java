@@ -124,6 +124,36 @@ public class RequestHandler implements Runnable {
                         }
                         continue;
 
+                    case SHARE:
+                        System.out.println("SHARE");
+                        if (user == null) { // if not logged in
+                            respond(new Reply(false, "Please log in first"), objectOutputStream);
+                            continue;
+                        }
+
+                        final ShareMessage shareMessage = (ShareMessage) message;
+                        final User targetUser = userManager.find(shareMessage.getTargetUser());
+
+                        if (targetUser == null) {
+                            respond(new Reply(false, "This user does not exist"), objectOutputStream);
+                            continue;
+                        }
+
+                        if (targetUser.findFile(shareMessage.getFilename()) != null) {
+                            respond(new Reply(false, "User already has that file!"), objectOutputStream);
+                            continue;
+                        }
+
+                        fileInfo = user.findFile(shareMessage.getFilename());
+                        if (fileInfo == null) {
+                            respond(new Reply(false, "Could not find file, maybe you need to upload it first"), objectOutputStream);
+                            continue;
+                        }
+
+                        targetUser.getFiles().add(fileInfo);
+                        respond(new Reply(true), objectOutputStream);
+
+                        continue;
                     case LOGIN:
                         System.out.println("LOGIN");
                         assert message instanceof LoginMessage;
