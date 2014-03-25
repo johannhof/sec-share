@@ -5,7 +5,15 @@ grant {
 };
 
 grant {
-    permission java.io.FilePermission "<<ALL FILES>>", "read,write,delete";
+    permission java.io.FilePermission "./-", "read,write,delete";
+};
+
+grant {
+   permission java.util.PropertyPermission "*", "read,write";
+};
+
+grant {
+      permission java.lang.RuntimePermission "loadLibrary./Applications/IntelliJ IDEA 13 CE.app/bin/libbreakgen64.jnilib";
 };
 
 /* java -Djava.security.manager -Djava.security.policy=<URL>*/

@@ -3,10 +3,7 @@ package client;
 import file_services.FileInfo;
 import file_services.SharedFile;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 //This class implements the core file operations so they aren't all stacked up on main
@@ -60,8 +57,6 @@ public class SecFileManager {
         boolean running = true;
         String input;
 
-        final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
-
         System.out.println(" +++ File Synchronization Starting +++ ");
         System.out.println("");
         System.out.println("Available commands: ");
@@ -70,6 +65,7 @@ public class SecFileManager {
         while (running) {
 
             System.out.println(" + New sync cycle + ");
+            Scanner in = new Scanner(System.in);
 
             //get server file list
             final Map<String, String> fileOps = getFileSyncRequiredOperations(myServer.listFiles(), userFiles.size() < 1);
@@ -93,19 +89,6 @@ public class SecFileManager {
 
             System.out.println("Directory sync cycle ended\n");
 
-            //get input
-            try {
-                if (inputReader.ready()) {
-
-                    input = inputReader.readLine();
-
-                    if (input.compareToIgnoreCase("exit") == 0)
-                        running = false;
-                }
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-
             //sleep for syncTimer
             try {
                 Thread.sleep(syncTimer * 1000);
@@ -113,8 +96,32 @@ public class SecFileManager {
                 e1.printStackTrace();
             }
 
+            //get input
+//            try {
+
+//                final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("what");
+            if (in.hasNext()) {
+
+                System.out.println("whatever");
+                input = in.nextLine();
+
+                    if (input.compareToIgnoreCase("exit") == 0)
+                        running = false;
+                }
+//            } catch (final IOException e) {
+//                e.printStackTrace();
+//            }
+
 
         }
+
+//        try {
+//            inputReader.close();
+//        } catch (final IOException e) {
+//            e.printStackTrace();
+//        }
+
         //TODO is this returning to main and exiting correctly?
         //every 30 synctimer seconds list compare upload download
         //TODO SYNC, must open some user input stream to read commands to stop
