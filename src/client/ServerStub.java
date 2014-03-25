@@ -1,7 +1,6 @@
 package client;
 
 import file_services.FileInfo;
-import file_services.FileOperations;
 import message.ListMessage;
 import message.MultiReply;
 import message.ShareMessage;
@@ -16,67 +15,63 @@ public class ServerStub {
     //typical methods here will be download file, get file
     //the idea is that the file manager never has to deal with messages just the required content	
 	//methods might be to be oveloaded to provide option of merely passing filename
-	//TOOD Datastructure for file management might be something other than pleb old list...
-	
-	NetworkClient networkClient;
-	
-	public ServerStub(NetworkClient networkClient) {
-		this.networkClient = networkClient;
-		
+    //TODO Datastructure for file management might be something other than pleb old list...
+
+    NetworkClient networkClient;
+
+    public ServerStub(final NetworkClient networkClient) {
+        this.networkClient = networkClient;
 	}
 	
 	//returns a boolean array which is the result of each share
 	//can only share files already on the server
-	public boolean[] shareFiles(List<File> files, String targetUser){
+    public boolean[] shareFiles(final List<File> files, final String targetUser) {
 
-		ArrayList<String> filenames = new ArrayList<String>();
-		
-		for(File f : files)
-			filenames.add(f.getName());
-		
-		ShareMessage request = new ShareMessage(filenames, targetUser);
-		MultiReply reply = (MultiReply) networkClient.msgSendReceive(request);
-		
-		//TODO careful with the order, the server must return the replies in the same order as the requests otherwise must add a filename list to multireply
+        final ArrayList<String> filenames = new ArrayList<>();
+
+        for (final File f : files)
+            filenames.add(f.getName());
+
+        final ShareMessage request = new ShareMessage(filenames, targetUser);
+        final MultiReply reply = (MultiReply) networkClient.msgSendReceive(request);
+
+        //TODO careful with the order, the server must return the replies in the same order as the requests otherwise must add a filename list to multireply
 		return reply.getResults();		
 	}
 	
 
 	public List<FileInfo> listFiles() {
-		
-		ListMessage request = new ListMessage(null);
-		
-		ListMessage reply = (ListMessage) networkClient.msgSendReceive(request);
-		
-		return reply.getFileInfo();
+
+        final ListMessage request = new ListMessage(null);
+
+        final ListMessage reply = (ListMessage) networkClient.msgSendReceive(request);
+
+        return reply.getFileInfo();
 	}
 
-	
-    public boolean putFile(File file) {
+
+    public boolean putFile(final File file) {
         return networkClient.sendFile(file);
     }
 
-    public boolean getFile() {
-
-        // TODO
-        return true;
+    public boolean getFile(final File file) {
+        return networkClient.receiveFile(file);
     }
 
-    public boolean[] putFiles(List<File> files) {
+    public boolean[] putFiles(final List<File> files) {
         
     	//TODO same issue as file sharing this needs to have an order consistant wiht server processing, not a problem just a concern :P
-    	boolean[] replies = new boolean[files.size()];
-    	int i = 0;
-    	
-    	for(File file: files)
-    		replies[i++] = putFile(file);
+        final boolean[] replies = new boolean[files.size()];
+        int i = 0;
+
+        for (final File file : files)
+            replies[i++] = putFile(file);
     		
         return replies;
     }
 
-    public boolean getFiles(List<File> files) {
-
-        // TODO
+    public boolean getFiles(final List<File> files) {
+        files.forEach(this::getFile);
         return true;
     }
 

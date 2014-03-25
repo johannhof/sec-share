@@ -1,7 +1,6 @@
 package client;
 
 import file_services.FileInfo;
-import file_services.FileOperations;
 
 import java.io.File;
 import java.util.List;
@@ -13,7 +12,7 @@ public class SecFileManager {
     ServerStub myServer;
 	File clientHome;
 
-    public SecFileManager(List<File> clientFiles, ServerStub server, String clientHome) {
+    public SecFileManager(final List<File> clientFiles, final ServerStub server, final String clientHome) {
         this.userFiles = clientFiles;
 		this.myServer = server;
 		this.clientHome = new File(clientHome);
@@ -30,20 +29,20 @@ public class SecFileManager {
 	}
 
 	public void listFiles() {
-		List<FileInfo> result = myServer.listFiles();
-		System.out.println(" +++ File list: +++ ");
-		for(FileInfo fi : result)
-			System.out.println(result.toString() + "\n\n");		
-	}
+        final List<FileInfo> result = myServer.listFiles();
+        System.out.println(" +++ File list: +++ ");
+        for (final FileInfo fi : result)
+            System.out.println(fi.toString() + "\n\n");
+    }
 
 	//TODO CAREFUL with array / list size and order
-	public void ShareFiles(String targetUser) {
-		boolean[] result = myServer.shareFiles(userFiles, targetUser);
+    public void ShareFiles(final String targetUser) {
+        final boolean[] result = myServer.shareFiles(userFiles, targetUser);
 
 		int i=0;
-		for(File file : userFiles){
-			if(result[i] == true)
-				System.out.println("+ Sharing " + file.getName() + " complete");
+        for (final File file : userFiles) {
+            if (result[i])
+                System.out.println("+ Sharing " + file.getName() + " complete");
 			else
 				System.out.println("+ Sharing " + file.getName() + " FAILED");
 			i++;
@@ -52,9 +51,9 @@ public class SecFileManager {
 	}
 	
 	//TODO
-	public void SyncFiles(int syncTimer) {
-		//TODO PROBLEM: WHEN getting a file, it has to replace old file if exists or create a new one then add to client list if it is a new share received
-				boolean running = true;
+    public void SyncFiles(final int syncTimer) {
+        //TODO PROBLEM: WHEN getting a file, it has to replace old file if exists or create a new one then add to client list if it is a new share received
+        final boolean running = true;
 
 		        while (running) {
 
