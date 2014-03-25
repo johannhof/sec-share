@@ -27,7 +27,6 @@ public class SecShareServer {
 
         //setup
         final File serverDirectory = new File(SERVER_REPO);
-        boolean listening = true;
 
         System.out.println("Welcome to SecShare\n");
 
@@ -37,7 +36,7 @@ public class SecShareServer {
 
             System.out.println("\nNow listening on port " + port + "\n");
             //start listening for incoming requests
-            while (listening)
+            while (true)
                 new RequestHandler(serverSocket.accept(), serverDirectory).run();
 
         } catch (final IOException ioe1) {

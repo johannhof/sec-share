@@ -6,6 +6,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Singleton that manages and persists users and their files.
+ */
 public class UserManager {
     private static final UserManager ourInstance = new UserManager();
 
@@ -50,6 +53,7 @@ public class UserManager {
             }
         }
 
+        // user not found, create one
         final User user = new User();
         user.setName(name);
         user.setPassword(password);
@@ -63,11 +67,11 @@ public class UserManager {
      */
     public void save() {
         try {
-            final XMLEncoder e = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(userFile)));
-            e.writeObject(users);
-            e.close();
-        } catch (final FileNotFoundException e1) {
-            e1.printStackTrace();
+            final XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(userFile)));
+            encoder.writeObject(users);
+            encoder.close();
+        } catch (final FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }

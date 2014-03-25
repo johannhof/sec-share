@@ -41,6 +41,7 @@ public class RequestHandler implements Runnable {
                     case EXIT:
                         System.out.println("EXIT");
                         return;
+
                     case PUT:
                         System.out.println("PUT");
                         if (user == null) { // if not logged in
@@ -89,6 +90,7 @@ public class RequestHandler implements Runnable {
                         }
 
                         continue;
+
                     case GET:
                         System.out.println("GET");
                         if (user == null) { // if not logged in
@@ -113,6 +115,7 @@ public class RequestHandler implements Runnable {
                         }
 
                         continue;
+
                     case LIST:
                         System.out.println("LIST not implemented yet");
                         if (user == null) { // if not logged in
@@ -120,6 +123,7 @@ public class RequestHandler implements Runnable {
                             continue;
                         }
                         continue;
+
                     case LOGIN:
                         System.out.println("LOGIN");
                         assert message instanceof LoginMessage;
@@ -134,6 +138,7 @@ public class RequestHandler implements Runnable {
                         }
 
                         continue;
+
                     default:
                         System.out.println("wtf");
                 }

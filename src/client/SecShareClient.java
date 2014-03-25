@@ -11,14 +11,14 @@ public class SecShareClient {
 
     private static final int SYNC_TIMER = 30;
     private static final String CLIENT_HOME = "./clientdir";
-
+    private static final int MAX_ATTEMPTS = 3;
 
     //SecShareClient -u <userId> -a <serverAddress> ( -c <filenames> | -p <userId> <filenames> | -g <filenames> | -s <filenames>)
     public static void main(final String[] args) {
 
-        String userID = null;
-        String serverAddress = null;
-        String mode = null;
+        final String userID;
+        final String serverAddress;
+        final String mode;
         String targetUser = null;
         //might want to use some other data structure
         final List<File> clientFiles = new ArrayList<>();
@@ -56,37 +56,48 @@ public class SecShareClient {
                 final File file = new File(CLIENT_HOME, args[i++]);
                 clientFiles.add(file);
             }
-
         }
 
+        System.out.println("Welcome to SecShare\n");
+
+        // parse address
+        // TODO this probably fails in case of http://localhost:3000
+        final String[] serverAddressAux = serverAddress.split(":");
+        if (serverAddressAux.length != 2) {
+            System.err.println("Invalid address");
+            System.exit(-1);
+        }
+
+        //connect to the server
+        final NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]), CLIENT_HOME);
 
         System.out.println("Welcome to SecShare\n");
-        //connect to the server
-        //TODO missing a try catch or a check to see if address is properly formated
-        final String[] serverAddressAux = serverAddress.split(":");
-
-        final NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]), CLIENT_HOME);
 
         //get user password
         String password = null;
         final BufferedReader inputReader = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Welcome to SecShare\n");
-        System.out.println("Please enter your password");
-        try {
-            password = inputReader.readLine();
-        } catch (final IOException e) {
 
-            e.printStackTrace();
-        }
+        for (int i = 0; i <= MAX_ATTEMPTS; i++) {
+            if (i == MAX_ATTEMPTS) {
+                System.err.println("Too many password attempts");
+                System.exit(-1);
+            }
 
+            // read password
+            System.out.println("Please enter your password");
+            try {
+                password = inputReader.readLine();
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
 
-        //check user password?
-        if (netClient.login(userID, password)) {
-            System.out.println("Logged in as" + userID);
-        } else {
-            ///TODO exception here or allow new attempts
-            System.err.println("Invalid Login");
-            System.exit(-1);
+            // check with server
+            if (netClient.login(userID, password)) {
+                System.out.println("Logged in as" + userID);
+                break;
+            } else {
+                System.out.println("Sorry. Try again.");
+            }
         }
 
         try {
@@ -95,7 +106,7 @@ public class SecShareClient {
             e.printStackTrace();
         }
 
-        //TODO possible problem with clientfiles beind null in case of -l
+        //TODO possible problem with clientfiles being null in case of -l
         final ServerStub mServerStub = new ServerStub(netClient);
         final SecFileManager mFileManager = new SecFileManager(clientFiles, mServerStub, CLIENT_HOME);
 
@@ -119,8 +130,6 @@ public class SecShareClient {
                 break;
             default: //Crap throw exception
                 break;
-
-
         }
 
         //disconnect from the server if still connected
