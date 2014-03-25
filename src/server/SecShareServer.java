@@ -35,6 +35,7 @@ public class SecShareServer {
         try {
             final ServerSocket serverSocket = new ServerSocket(port);
 
+            System.out.println("\nNow listening on port " + port + "\n");
             //start listening for incoming requests
             while (listening)
                 new RequestHandler(serverSocket.accept(), serverDirectory).run();
@@ -44,9 +45,6 @@ public class SecShareServer {
             ioe1.printStackTrace();
             System.exit(-1);
         }
-
-        System.out.println("\nNow listening on port " + port + "\n");
-
 
     }
 

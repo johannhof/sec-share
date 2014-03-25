@@ -24,8 +24,7 @@ public class RequestHandler implements Runnable {
         thread.run();
     }
 
-    private static void respond(final Message message, final OutputStream outputStream) throws IOException {
-        final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+    private static void respond(final Message message, final ObjectOutputStream objectOutputStream) throws IOException {
         objectOutputStream.writeObject(message);
         objectOutputStream.flush();
     }
@@ -35,68 +34,78 @@ public class RequestHandler implements Runnable {
         final UserManager userManager = UserManager.getInstance();
         User user = null;
         try {
-            boolean listen = true;
             final InputStream inputStream = socket.getInputStream();
+            boolean listen = true;
             while (listen) {
                 final ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                final ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 final Message message = (Message) objectInputStream.readObject();
 
                 switch (message.GetOp()) {
                     case EXIT:
                         System.out.println("EXIT");
                         listen = false;
-                        break;
+                        continue;
                     case PUT:
                         System.out.println("PUT");
                         if (user == null) { // if not logged in
-                            respond(new Reply(false), socket.getOutputStream());
-                            break;
+                            respond(new Reply(false), objectOutputStream);
+                            continue;
                         }
 
                         assert message instanceof PutMessage;
 
                         final PutMessage putMessage = (PutMessage) message;
                         FileInfo fileInfo = user.findFile(putMessage.getFilename());
-                        final String filePath = this.serverDirectory + "/" + fileInfo.getOwner() + "/" + putMessage.getFilename();
 
                         // if the user has a file with this name in his list
                         if (fileInfo != null) {
-                            final File file = new File(filePath);
+                            final File file = new File(this.serverDirectory + "/" + fileInfo.getOwner(), putMessage.getFilename());
 
-                            // if there is a younger file on the server, don't overwrite
-                            if (file.exists() && file.lastModified() > putMessage.getTimestamp()) {
-                                respond(new Reply(false), socket.getOutputStream());
+                            // if it's a directory or there is a younger file on the server, don't overwrite
+                            if (file.isDirectory() || (file.exists() && file.lastModified() > putMessage.getTimestamp())) {
+                                respond(new Reply(false), objectOutputStream);
                             } else {
-                                respond(new Reply(true), socket.getOutputStream());
-                                FileOperations.download(inputStream, filePath, putMessage.getFilesize());
+                                respond(new Reply(true), objectOutputStream);
+                                FileOperations.download(file, inputStream, putMessage.getFilesize());
                             }
                         } else {
-                            // create a new file with the user as owner
+                            respond(new Reply(true), objectOutputStream);
+
+                            final File file = new File(this.serverDirectory + "/" + user.getName(), putMessage.getFilename());
+
+                            // make sure that the path exists
+                            file.getParentFile().mkdirs();
+
+                            FileOperations.download(
+                                    file,
+                                    inputStream,
+                                    putMessage.getFilesize()
+                            );
+
+                            // create a new fileinfo with the user as owner
                             fileInfo = new FileInfo();
                             fileInfo.setFilename(putMessage.getFilename());
                             fileInfo.setOwner(user.getName());
                             user.addFile(fileInfo);
                             userManager.save();
-
-                            respond(new Reply(true), socket.getOutputStream());
-                            FileOperations.download(inputStream, filePath, putMessage.getFilesize());
                         }
 
-                        break;
+                        continue;
                     case GET:
                         System.out.println("GET not implemented yet");
                         if (user == null) { // if not logged in
-                            respond(new Reply(false), socket.getOutputStream());
-                            break;
+                            respond(new Reply(false), objectOutputStream);
+                            continue;
                         }
-                        break;
+                        continue;
                     case LIST:
                         System.out.println("LIST not implemented yet");
                         if (user == null) { // if not logged in
-                            respond(new Reply(false), socket.getOutputStream());
-                            break;
+                            respond(new Reply(false), objectOutputStream);
+                            continue;
                         }
-                        break;
+                        continue;
                     case LOGIN:
                         System.out.println("LOGIN");
                         assert message instanceof LoginMessage;
@@ -105,12 +114,12 @@ public class RequestHandler implements Runnable {
                         user = userManager.findOrCreate(loginMessage.getUsername(), loginMessage.getPassword());
 
                         if (user == null) {
-                            respond(new Reply(false), socket.getOutputStream());
+                            respond(new Reply(false), objectOutputStream);
                         } else {
-                            respond(new Reply(true), socket.getOutputStream());
+                            respond(new Reply(true), objectOutputStream);
                         }
 
-                        break;
+                        continue;
                     default:
                         System.out.println("wtf");
                 }

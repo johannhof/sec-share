@@ -14,7 +14,7 @@ public class NetworkClient {
     InputStream inStream;
     String clientHome;
 
-    public NetworkClient(String userID, String host, int port, String clientHome) {
+    public NetworkClient(final String userID, final String host, final int port, final String clientHome) {
 
         this.userID = userID;
 
@@ -27,13 +27,13 @@ public class NetworkClient {
 
             this.inStream = clientSocket.getInputStream();
 
-        } catch (IOException ioExp) {
+        } catch (final IOException ioExp) {
             System.out.println("Error connecting to " + host + " in port " + port);
 
             if (this.clientSocket.isBound())
                 try {
                     this.clientSocket.close();
-                } catch (IOException ioExp2) {
+                } catch (final IOException ioExp2) {
                     ioExp2.printStackTrace();
                 }
             ioExp.printStackTrace();
@@ -41,8 +41,8 @@ public class NetworkClient {
 
     }
 
-    public boolean login(String username, String password) {
-        Reply reply = (Reply) msgSendReceive(new LoginMessage(username, password));
+    public boolean login(final String username, final String password) {
+        final Reply reply = (Reply) msgSendReceive(new LoginMessage(username, password));
         return reply.isSuccess();
     }
 
@@ -51,16 +51,16 @@ public class NetworkClient {
         System.out.println("Disconnecting...");
 
         try {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream);
+            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream);
             objectOutputStream.writeObject(new ExitMessage());
             objectOutputStream.flush();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
 
         try {
             this.clientSocket.close();
-        } catch (IOException ioe3) {
+        } catch (final IOException ioe3) {
             System.out.println("Error while disconnecting socket");
             ioe3.printStackTrace();
         }
@@ -68,15 +68,16 @@ public class NetworkClient {
     }
 
 
-    public Message msgSendReceive(Message msg) {
+    public Message msgSendReceive(final Message msg) {
+        System.out.println("Sending " + msg.GetOp().toString());
 
         Message reply = null;
 
         try {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream);
+            final ObjectOutputStream objectOutputStream = new ObjectOutputStream(outStream);
             objectOutputStream.writeObject(msg);
-            objectOutputStream.flush();
-            ObjectInputStream objectInputStream = new ObjectInputStream(inStream);
+//            objectOutputStream.flush();
+            final ObjectInputStream objectInputStream = new ObjectInputStream(inStream);
             reply = (Message) objectInputStream.readObject();
 
         } catch (ClassNotFoundException | IOException e) {
@@ -92,14 +93,15 @@ public class NetworkClient {
      * @param file the file to send
      * @return a boolean indicating if the file was uploaded
      */
-    public boolean sendFile(File file) {
+    public boolean sendFile(final File file) {
         if (file == null || !file.exists()) {
             throw new IllegalArgumentException("Cannot find file to send");
         }
 
         // request a download on the server
-        Reply reply = (Reply) msgSendReceive(new PutMessage(file));
+        final Reply reply = (Reply) msgSendReceive(new PutMessage(file));
 
+        System.out.println("uploading");
         // TODO isResult is probably not meant for this, right?
         // if the server allows the upload
         if (reply.isSuccess()) {
@@ -112,7 +114,7 @@ public class NetworkClient {
 
     }
 
-    public boolean receiveFile(File clientHome, String filename) {
+    public boolean receiveFile(final File clientHome, final String filename) {
         //TODO
         return true;
     }
