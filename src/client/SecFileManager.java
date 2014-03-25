@@ -55,18 +55,6 @@ public class SecFileManager {
         System.out.println(" +++ File sharing complete +++ ");
     }
 
-		int i=0;
-		for(File file : userFiles){
-			if(result[i] == true)
-				System.out.println("+ Sharing " + file.getName() + " complete");
-			else
-				System.out.println("+ Sharing " + file.getName() + " FAILED");
-			i++;
-		}
-		System.out.println(" +++ File sharing complete +++ ");		
-	}
-
-
 	//TODO
 	public void SyncFiles(int syncTimer) {
 		//TODO PROBLEM: WHEN getting a file, it has to replace old file if exists or create a new one then add to client list if it is a new share received
