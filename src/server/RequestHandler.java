@@ -7,6 +7,7 @@ import message.*;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.List;
 
 public class RequestHandler implements Runnable {
 
@@ -116,11 +117,22 @@ public class RequestHandler implements Runnable {
                         continue;
 
                     case LIST:
-                        System.out.println("LIST not implemented yet");
+                        System.out.println("LIST");
                         if (user == null) { // if not logged in
                             respond(new Reply(false, "Please log in first"), objectOutputStream);
                             continue;
                         }
+                        
+                        final List<FileInfo> userFiles = user.getFiles();
+                        
+                        	for (FileInfo fi : userFiles){
+                                final File file = new File(this.serverDirectory + "/" + fi.getOwner(), fi.getFilename());
+                                assert file.exists();
+                        		fi.setLastModified(file.lastModified());
+                        	}
+                        
+                        respond(new ListMessage(userFiles), objectOutputStream);
+                        
                         continue;
 
                     case SHARE:
@@ -153,6 +165,7 @@ public class RequestHandler implements Runnable {
                         respond(new Reply(true), objectOutputStream);
 
                         continue;
+                        
                     case LOGIN:
                         System.out.println("LOGIN");
                         assert message instanceof LoginMessage;
