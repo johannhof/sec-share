@@ -68,8 +68,6 @@ public class NetworkClient {
 
 
     public Message msgSendReceive(final Message msg) {
-        System.out.println("Sending " + msg.GetOp().toString());
-
         Message reply = null;
 
         try {

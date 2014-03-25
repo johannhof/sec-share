@@ -91,13 +91,6 @@ public class SecFileManager {
                     myServer.getFile(new SharedFile(clientHome, fileName));
             }
 
-            //sleep for syncTimer
-            try {
-                Thread.sleep(syncTimer * 1000);
-            } catch (final InterruptedException e1) {
-                e1.printStackTrace();
-            }
-
             System.out.println("Directory sync cycle ended\n");
 
             //get input
@@ -113,13 +106,21 @@ public class SecFileManager {
                 e.printStackTrace();
             }
 
+            //sleep for syncTimer
+            try {
+                Thread.sleep(syncTimer * 1000);
+            } catch (final InterruptedException e1) {
+                e1.printStackTrace();
+            }
+
+
         }
         //TODO is this returning to main and exiting correctly?
         //every 30 synctimer seconds list compare upload download
         //TODO SYNC, must open some user input stream to read commands to stop
     }
 
-    public void walkDir(final File root, final HashMap<String, Long> localFileData, final Set<String> distinctFilenames) {
+    private void walkDir(final File root, final HashMap<String, Long> localFileData, final Set<String> distinctFilenames) {
 
         final File[] list = root.listFiles();
 
