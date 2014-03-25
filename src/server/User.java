@@ -6,6 +6,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A Java Bean to serialize the user model, including information about all files the user has saved.
+ * <p>
+ * Yes, we are aware that saving this information in a single file will probably not scale well.
+ */
 public class User implements Serializable {
 
     private static final long serialVersionUID = 278655679754078741L;

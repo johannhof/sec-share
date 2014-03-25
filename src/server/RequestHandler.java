@@ -88,6 +88,8 @@ public class RequestHandler implements Runnable {
                             fileInfo.setFilename(putMessage.getFilename());
                             fileInfo.setOwner(user.getName());
                             user.addFile(fileInfo);
+
+                            // write data to xml
                             userManager.save();
                         }
 

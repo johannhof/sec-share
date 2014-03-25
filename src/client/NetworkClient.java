@@ -101,22 +101,30 @@ public class NetworkClient {
         // request a download on the server
         final Reply reply = (Reply) msgSendReceive(new PutMessage(file));
 
-        System.out.println("uploading");
-        // TODO isResult is probably not meant for this, right?
         // if the server allows the upload
         if (reply.isSuccess()) {
             FileOperations.upload(file, outStream);
             return true;
         }
 
-        // TODO warn that file is out of date
+        System.err.println(reply.getMessage());
         return false;
-
     }
 
-    public boolean receiveFile(final File clientHome, final String filename) {
-        //TODO
-        return true;
+    public boolean receiveFile(final File file) {
+        assert file != null;
+
+        // request a download on the server
+        final Reply reply = (Reply) msgSendReceive(new GetMessage(file.getName()));
+
+        // if the server allows the download
+        if (reply.isSuccess()) {
+            FileOperations.download(file, inStream, reply.getNumber());
+            return true;
+        }
+
+        System.err.println(reply.getMessage());
+        return false;
     }
 
     //might be better to add methods to upload / download several files
