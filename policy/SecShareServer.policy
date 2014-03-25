@@ -1,0 +1,11 @@
+
+grant {
+	permission java.net.SocketPermission "*:23456", "accept,listen"
+};
+
+grant {
+permission java.io.FilePermission "${SERVERHOME}/-", "read,write,delete"
+
+};
+
+/* java -Djava.security.manager -Djava.security.policy==<URL>*/
