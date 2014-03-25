@@ -1,7 +1,8 @@
 package client;
 
+import file_services.SharedFile;
+
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class SecShareClient {
         final String mode;
         String targetUser = null;
         //might want to use some other data structure
-        final List<File> clientFiles = new ArrayList<>();
+        final List<SharedFile> clientFiles = new ArrayList<>();
 
         //CL argument handling
         //argument handling will assumed a list of files separated by spaces
@@ -53,7 +54,7 @@ public class SecShareClient {
 
             //check files and add
             while (i < args.length) {
-                final File file = new File(CLIENT_HOME, args[i++]);
+                final SharedFile file = new SharedFile(CLIENT_HOME, args[i++]);
                 clientFiles.add(file);
             }
         }

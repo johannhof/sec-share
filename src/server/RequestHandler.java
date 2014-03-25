@@ -1,7 +1,7 @@
 package server;
 
 import file_services.FileInfo;
-import file_services.FileOperations;
+import file_services.SharedFile;
 import message.*;
 
 import java.io.*;
@@ -56,28 +56,27 @@ public class RequestHandler implements Runnable {
 
                         // if the user has a file with this name in his list
                         if (fileInfo != null) {
-                            final File file = new File(this.serverDirectory + "/" + fileInfo.getOwner(), putMessage.getFilename());
+                            final SharedFile file = new SharedFile(this.serverDirectory + "/" + fileInfo.getOwner(), putMessage.getFilename());
+
+                            if (file.isDirectory()) {
+                                respond(new Reply(false, "Can not write directories - " + putMessage.getFilename()), objectOutputStream);
+                            }
 
                             // if it's a directory or there is a younger file on the server, don't overwrite
-                            if (file.isDirectory() || (file.exists() && file.lastModified() > putMessage.getTimestamp())) {
-                                respond(new Reply(false, "Could not write file"), objectOutputStream);
+                            if ((file.exists() && file.lastModified() > putMessage.getTimestamp())) {
+                                respond(new Reply(false,
+                                        "Could not write file " + putMessage.getFilename() + ", there is a more recent version on the server"
+                                ), objectOutputStream);
                             } else {
                                 respond(new Reply(true), objectOutputStream);
-                                FileOperations.download(file, inputStream, putMessage.getFilesize());
+                                file.download(inputStream, putMessage.getFilesize());
                             }
                         } else {
                             respond(new Reply(true), objectOutputStream);
 
-                            final File file = new File(this.serverDirectory + "/" + user.getName(), putMessage.getFilename());
+                            final SharedFile file = new SharedFile(this.serverDirectory + "/" + user.getName(), putMessage.getFilename());
 
-                            // make sure that the path exists
-                            file.getParentFile().mkdirs();
-
-                            FileOperations.download(
-                                    file,
-                                    inputStream,
-                                    putMessage.getFilesize()
-                            );
+                            file.download(inputStream, putMessage.getFilesize());
 
                             // create a new fileinfo with the user as owner
                             fileInfo = new FileInfo();
@@ -104,13 +103,13 @@ public class RequestHandler implements Runnable {
                         if (fileInfo == null) { // user doesn't have that file
                             respond(new Reply(false, "Could not find file"), objectOutputStream);
                         } else {
-                            final File file = new File(this.serverDirectory + "/" + fileInfo.getOwner(), fileInfo.getFilename());
+                            final SharedFile file = new SharedFile(this.serverDirectory + "/" + fileInfo.getOwner(), fileInfo.getFilename());
 
                             if (!file.exists() || file.isDirectory()) {
                                 respond(new Reply(false, "Could not find file"), objectOutputStream);
                             } else {
                                 respond(new Reply(true, file.length()), objectOutputStream);
-                                FileOperations.upload(file, socket.getOutputStream());
+                                file.upload(socket.getOutputStream());
                             }
                         }
 

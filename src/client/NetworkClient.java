@@ -1,6 +1,6 @@
 package client;
 
-import file_services.FileOperations;
+import file_services.SharedFile;
 import message.*;
 
 import java.io.*;
@@ -92,7 +92,7 @@ public class NetworkClient {
      * @param file the file to send
      * @return a boolean indicating if the file was uploaded
      */
-    public boolean sendFile(final File file) {
+    public boolean sendFile(final SharedFile file) {
         if (file == null || !file.exists()) {
             throw new IllegalArgumentException("Cannot find file to send");
         }
@@ -102,7 +102,7 @@ public class NetworkClient {
 
         // if the server allows the upload
         if (reply.isSuccess()) {
-            FileOperations.upload(file, outStream);
+            file.upload(outStream);
             return true;
         }
 
@@ -110,7 +110,7 @@ public class NetworkClient {
         return false;
     }
 
-    public boolean receiveFile(final File file) {
+    public boolean receiveFile(final SharedFile file) {
         assert file != null;
 
         // request a download on the server
@@ -118,7 +118,7 @@ public class NetworkClient {
 
         // if the server allows the download
         if (reply.isSuccess()) {
-            FileOperations.download(file, inStream, reply.getNumber());
+            file.download(inStream, reply.getNumber());
             return true;
         }
 

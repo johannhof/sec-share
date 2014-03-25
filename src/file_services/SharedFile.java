@@ -1,25 +1,40 @@
 package file_services;
 
 import java.io.*;
+import java.nio.file.Paths;
 
-/**
- * A File with the ability to download and upload.
- */
-public class FileOperations {
+public class SharedFile extends File {
 
+    private final String base;
+
+    public SharedFile(final String base, final String path) {
+        super(base, path);
+        this.base = new File(base).getAbsolutePath();
+    }
+
+    /**
+     * Makes the path relative to the provided base path.
+     *
+     * @param path the path to relativize
+     * @param base the base directory
+     * @return the relative path
+     */
+    private static String relativePath(final String path, final String base) {
+        return Paths.get(base).relativize(Paths.get(path)).toString();
+    }
 
     /**
      * Uploads the file to the specified OutputStream.
      *
      * @param outputStream the stream to upload to
      */
-    public static void upload(final File file, final OutputStream outputStream) {
+    public void upload(final OutputStream outputStream) {
         assert outputStream != null;
 
         BufferedInputStream bis = null;
         try {
-            final byte[] mybytearray = new byte[(int) file.length()];
-            bis = new BufferedInputStream(new FileInputStream(file));
+            final byte[] mybytearray = new byte[(int) this.length()];
+            bis = new BufferedInputStream(new FileInputStream(this));
             bis.read(mybytearray, 0, mybytearray.length);
             outputStream.write(mybytearray, 0, mybytearray.length);
             outputStream.flush();
@@ -39,12 +54,14 @@ public class FileOperations {
     /**
      * Saves the file by loading the specified number of bytes from the specified stream.
      *
-     * @param file        the file to download the data to
      * @param inputStream the stream to load data from
      * @param filesize    number of bytes to load
      */
-    public static void download(final File file, final InputStream inputStream, final long filesize) {
+    public void download(final InputStream inputStream, final long filesize) {
         assert inputStream != null;
+
+        // make sure that the path exists
+        getParentFile().mkdirs();
 
         byte[] buffer = new byte[1024];
 
@@ -53,12 +70,12 @@ public class FileOperations {
 
         FileOutputStream fileOutputStream = null;
         try {
-            fileOutputStream = new FileOutputStream(file);
+            fileOutputStream = new FileOutputStream(this);
 
             while (aux > 0) {
                 bytesRead = inputStream.read(buffer, 0, 1024);
                 aux -= bytesRead;
-                fileOutputStream.write(buffer, 0, (int) Math.max(bytesRead, aux));
+                fileOutputStream.write(buffer, 0, (int) bytesRead);
                 buffer = new byte[1024];
             }
 
@@ -74,6 +91,10 @@ public class FileOperations {
                 e.printStackTrace();
             }
         }
+    }
 
+    @Override
+    public String getName() {
+        return Paths.get(base).relativize(Paths.get(getAbsolutePath())).toString();
     }
 }
