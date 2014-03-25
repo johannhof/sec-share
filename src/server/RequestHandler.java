@@ -2,10 +2,7 @@ package server;
 
 import file_services.FileInfo;
 import file_services.FileOperations;
-import message.LoginMessage;
-import message.Message;
-import message.PutMessage;
-import message.Reply;
+import message.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -35,8 +32,7 @@ public class RequestHandler implements Runnable {
         User user = null;
         try {
             final InputStream inputStream = socket.getInputStream();
-            boolean listen = true;
-            while (listen) {
+            while (true) {
                 final ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
                 final ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                 final Message message = (Message) objectInputStream.readObject();
@@ -44,12 +40,12 @@ public class RequestHandler implements Runnable {
                 switch (message.GetOp()) {
                     case EXIT:
                         System.out.println("EXIT");
-                        listen = false;
-                        continue;
+                        return;
+
                     case PUT:
                         System.out.println("PUT");
                         if (user == null) { // if not logged in
-                            respond(new Reply(false), objectOutputStream);
+                            respond(new Reply(false, "Please log in first"), objectOutputStream);
                             continue;
                         }
 
@@ -64,7 +60,7 @@ public class RequestHandler implements Runnable {
 
                             // if it's a directory or there is a younger file on the server, don't overwrite
                             if (file.isDirectory() || (file.exists() && file.lastModified() > putMessage.getTimestamp())) {
-                                respond(new Reply(false), objectOutputStream);
+                                respond(new Reply(false, "Could not write file"), objectOutputStream);
                             } else {
                                 respond(new Reply(true), objectOutputStream);
                                 FileOperations.download(file, inputStream, putMessage.getFilesize());
@@ -94,19 +90,69 @@ public class RequestHandler implements Runnable {
                         }
 
                         continue;
+
                     case GET:
-                        System.out.println("GET not implemented yet");
+                        System.out.println("GET");
                         if (user == null) { // if not logged in
-                            respond(new Reply(false), objectOutputStream);
+                            respond(new Reply(false, "Please log in first"), objectOutputStream);
                             continue;
                         }
+
+                        final GetMessage getMessage = (GetMessage) message;
+                        fileInfo = user.findFile(getMessage.getFilename());
+
+                        if (fileInfo == null) { // user doesn't have that file
+                            respond(new Reply(false, "Could not find file"), objectOutputStream);
+                        } else {
+                            final File file = new File(this.serverDirectory + "/" + fileInfo.getOwner(), fileInfo.getFilename());
+
+                            if (!file.exists() || file.isDirectory()) {
+                                respond(new Reply(false, "Could not find file"), objectOutputStream);
+                            } else {
+                                respond(new Reply(true, file.length()), objectOutputStream);
+                                FileOperations.upload(file, socket.getOutputStream());
+                            }
+                        }
+
                         continue;
+
                     case LIST:
                         System.out.println("LIST not implemented yet");
                         if (user == null) { // if not logged in
-                            respond(new Reply(false), objectOutputStream);
+                            respond(new Reply(false, "Please log in first"), objectOutputStream);
                             continue;
                         }
+                        continue;
+
+                    case SHARE:
+                        System.out.println("SHARE");
+                        if (user == null) { // if not logged in
+                            respond(new Reply(false, "Please log in first"), objectOutputStream);
+                            continue;
+                        }
+
+                        final ShareMessage shareMessage = (ShareMessage) message;
+                        final User targetUser = userManager.find(shareMessage.getTargetUser());
+
+                        if (targetUser == null) {
+                            respond(new Reply(false, "This user does not exist"), objectOutputStream);
+                            continue;
+                        }
+
+                        if (targetUser.findFile(shareMessage.getFilename()) != null) {
+                            respond(new Reply(false, "User already has that file!"), objectOutputStream);
+                            continue;
+                        }
+
+                        fileInfo = user.findFile(shareMessage.getFilename());
+                        if (fileInfo == null) {
+                            respond(new Reply(false, "Could not find file, maybe you need to upload it first"), objectOutputStream);
+                            continue;
+                        }
+
+                        targetUser.getFiles().add(fileInfo);
+                        respond(new Reply(true), objectOutputStream);
+
                         continue;
                     case LOGIN:
                         System.out.println("LOGIN");
@@ -122,6 +168,7 @@ public class RequestHandler implements Runnable {
                         }
 
                         continue;
+
                     default:
                         System.out.println("wtf");
                 }

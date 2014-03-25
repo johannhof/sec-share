@@ -1,7 +1,6 @@
 package client;
 
 import file_services.FileInfo;
-import file_services.FileOperations;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,40 +15,45 @@ public class SecFileManager {
 
 	List<File> userFiles;
 	ServerStub myServer;
-	File clientHome;
+    File clientHome;
 
-	public SecFileManager(List<File> clientFiles, ServerStub server, String clientHome) {
-		this.userFiles = clientFiles;
-		this.myServer = server;
-		this.clientHome = new File(clientHome);
-	}
+    public SecFileManager(final List<File> clientFiles, final ServerStub server, final String clientHome) {
+        this.userFiles = clientFiles;
+        this.myServer = server;
+        this.clientHome = new File(clientHome);
+    }
 
-	public void uploadAll() {
-		myServer.putFiles(userFiles);
-		System.out.println(" +++ Files copied to server +++ ");
-	}
+    public void uploadAll() {
+        myServer.putFiles(userFiles);
+        System.out.println(" +++ Files copied to server +++ ");
+    }
 
-	public void downloadAll() {
-		myServer.getFiles(userFiles);
-		System.out.println(" +++ Files copied from server +++ ");
-	}
+    public void downloadAll() {
+        myServer.getFiles(userFiles);
+        System.out.println(" +++ Files copied from server +++ ");
+    }
 
-	//TODO careful with empty file list will return false must add check to see if class is a list or a reply on the stub then return accordingly
-	public void listFiles() {
-		List<FileInfo> result = myServer.listFiles();
-		System.out.println(" +++ File list: +++ ");
-		
-		for(FileInfo fi : result)
-			System.out.println(result.toString() + "\n\n");		
-	}
+    public void listFiles() {
+        final List<FileInfo> result = myServer.listFiles();
+        System.out.println(" +++ File list: +++ ");
+        for (final FileInfo fi : result)
+            System.out.println(fi.toString() + "\n\n");
+    }
 	
 	private List<FileInfo> getServerFileList(){
 		return myServer.listFiles();
 	}
 
-	//TODO CAREFUL with array / list size and order
-	public void ShareFiles(String targetUser) {
-		boolean[] result = myServer.shareFiles(userFiles, targetUser);
+    public void ShareFiles(final String targetUser) {
+        for (final File file : userFiles) {
+            if (myServer.shareFile(file, targetUser)) {
+                System.out.println("+ Sharing " + file.getName() + " complete");
+            } else {
+                System.out.println("+ Sharing " + file.getName() + " FAILED");
+            }
+        }
+        System.out.println(" +++ File sharing complete +++ ");
+    }
 
 		int i=0;
 		for(File file : userFiles){
