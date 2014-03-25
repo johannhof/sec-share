@@ -116,11 +116,12 @@ public class NetworkClient {
         assert file != null;
 
         // request a download on the server
-        final Reply reply = (Reply) msgSendReceive(new GetMessage(file.getName()));
+        final DownloadReply reply = (DownloadReply) msgSendReceive(new GetMessage(file.getName()));
 
         // if the server allows the download
         if (reply.isSuccess()) {
             file.download(inStream, reply.getNumber());
+            file.setLastModified(reply.getTimestamp());
             System.out.println(file.getName() + "was downloaded");
             return true;
         }

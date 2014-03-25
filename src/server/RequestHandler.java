@@ -71,6 +71,7 @@ public class RequestHandler implements Runnable {
                             } else {
                                 respond(new Reply(true), objectOutputStream);
                                 file.download(inputStream, putMessage.getFilesize());
+                                file.setLastModified(putMessage.getTimestamp());
                             }
                         } else {
                             respond(new Reply(true), objectOutputStream);
@@ -78,6 +79,7 @@ public class RequestHandler implements Runnable {
                             final SharedFile file = new SharedFile(this.serverDirectory + "/" + user.getName(), putMessage.getFilename());
 
                             file.download(inputStream, putMessage.getFilesize());
+                            file.setLastModified(putMessage.getTimestamp());
 
                             // create a new fileinfo with the user as owner
                             fileInfo = new FileInfo();
@@ -109,7 +111,7 @@ public class RequestHandler implements Runnable {
                             if (!file.exists() || file.isDirectory()) {
                                 respond(new Reply(false, "Could not find file"), objectOutputStream);
                             } else {
-                                respond(new Reply(true, file.length()), objectOutputStream);
+                                respond(new DownloadReply(true, file.length(), file.lastModified()), objectOutputStream);
                                 file.upload(socket.getOutputStream());
                             }
                         }
