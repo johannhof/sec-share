@@ -93,7 +93,9 @@ public class NetworkClient {
      * @return a boolean indicating if the file was uploaded
      */
     public boolean sendFile(final SharedFile file) {
-        if (file == null || !file.exists()) {
+        assert file != null;
+
+        if (!file.exists()) {
             throw new IllegalArgumentException("Cannot find file to send");
         }
 
@@ -119,6 +121,7 @@ public class NetworkClient {
         // if the server allows the download
         if (reply.isSuccess()) {
             file.download(inStream, reply.getNumber());
+            System.out.println(file.getName() + "was downloaded");
             return true;
         }
 

@@ -122,17 +122,17 @@ public class RequestHandler implements Runnable {
                             respond(new Reply(false, "Please log in first"), objectOutputStream);
                             continue;
                         }
-                        
+
                         final List<FileInfo> userFiles = user.getFiles();
-                        
-                        	for (FileInfo fi : userFiles){
-                                final File file = new File(this.serverDirectory + "/" + fi.getOwner(), fi.getFilename());
-                                assert file.exists();
-                        		fi.setLastModified(file.lastModified());
-                        	}
-                        
+
+                        for (final FileInfo fi : userFiles) {
+                            final SharedFile file = new SharedFile(this.serverDirectory + "/" + fi.getOwner(), fi.getFilename());
+                            assert file.exists();
+                            fi.setLastModified(file.lastModified());
+                        }
+
                         respond(new ListMessage(userFiles), objectOutputStream);
-                        
+
                         continue;
 
                     case SHARE:
@@ -162,10 +162,12 @@ public class RequestHandler implements Runnable {
                         }
 
                         targetUser.getFiles().add(fileInfo);
+                        userManager.save();
+
                         respond(new Reply(true), objectOutputStream);
 
                         continue;
-                        
+
                     case LOGIN:
                         System.out.println("LOGIN");
                         assert message instanceof LoginMessage;

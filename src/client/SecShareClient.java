@@ -10,7 +10,7 @@ import java.util.List;
 
 public class SecShareClient {
 
-    private static final int SYNC_TIMER = 30;
+    private static final int SYNC_TIMER = 10;
     private static final String CLIENT_HOME = "./";
     private static final int MAX_ATTEMPTS = 3;
 
