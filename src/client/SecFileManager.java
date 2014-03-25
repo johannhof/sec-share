@@ -13,54 +13,54 @@ import java.util.Set;
 //This class implements the core file operations so they aren't all stacked up on main
 public class SecFileManager {
 
-	List<File> userFiles;
-	ServerStub myServer;
-    File clientHome;
+	private List<File> userFiles;
+	private ServerStub myServer;
+	private File clientHome;
 
-    public SecFileManager(final List<File> clientFiles, final ServerStub server, final String clientHome) {
-        this.userFiles = clientFiles;
-        this.myServer = server;
-        this.clientHome = new File(clientHome);
-    }
-
-    public void uploadAll() {
-        myServer.putFiles(userFiles);
-        System.out.println(" +++ Files copied to server +++ ");
-    }
-
-    public void downloadAll() {
-        myServer.getFiles(userFiles);
-        System.out.println(" +++ Files copied from server +++ ");
-    }
-
-    public void listFiles() {
-        final List<FileInfo> result = myServer.listFiles();
-        System.out.println(" +++ File list: +++ ");
-        for (final FileInfo fi : result)
-            System.out.println(fi.toString() + "\n\n");
-    }
-	
-	private List<FileInfo> getServerFileList(){
-		return myServer.listFiles();
+	public SecFileManager(List<File> clientFiles, final ServerStub server, final String clientHome) {
+		this.userFiles = clientFiles;
+		this.myServer = server;
+		this.clientHome = new File(clientHome);
 	}
 
-    public void ShareFiles(final String targetUser) {
-        for (final File file : userFiles) {
-            if (myServer.shareFile(file, targetUser)) {
-                System.out.println("+ Sharing " + file.getName() + " complete");
-            } else {
-                System.out.println("+ Sharing " + file.getName() + " FAILED");
-            }
-        }
-        System.out.println(" +++ File sharing complete +++ ");
-    }
+	public void uploadAll() {
+		myServer.putFiles(userFiles);
+		System.out.println(" +++ Files copied to server +++ ");
+	}
+
+	public void downloadAll() {
+		myServer.getFiles(userFiles);
+		System.out.println(" +++ Files copied from server +++ ");
+	}
+
+	public void listFiles() {
+		final List<FileInfo> result = myServer.listFiles();
+		System.out.println(" +++ File list: +++ ");
+		if(result == null)
+			System.out.println(" + No files to display + ");
+		else{
+			for (final FileInfo fi : result)
+				System.out.println(fi.toString() + "\n\n");
+		}
+	}
+
+	public void ShareFiles(final String targetUser) {
+		for (final File file : userFiles) {
+			if (myServer.shareFile(file, targetUser)) {
+				System.out.println("+ Sharing " + file.getName() + " complete");
+			} else {
+				System.out.println("+ Sharing " + file.getName() + " FAILED");
+			}
+		}
+		System.out.println(" +++ File sharing complete +++ ");
+	}
 
 	//TODO
 	public void SyncFiles(int syncTimer) {
 		//TODO PROBLEM: WHEN getting a file, it has to replace old file if exists or create a new one then add to client list if it is a new share received
 		boolean running = true;
 		String input;
-		
+
 		System.out.println(" +++ File Synchronization Starting +++ ");		
 		System.out.println("");
 		System.out.println("Available commands: ");
@@ -70,10 +70,10 @@ public class SecFileManager {
 
 			System.out.println(" + New sync cycle + ");
 			//TODO split the uploads / downloads timewise			
-			
+
 			//get server file list
-			
-			Map<String, String> fileSyncStatus = fileListCompare();
+
+			Map<String, String> fileOps = getFileSyncRequiredOperations(myServer.listFiles());
 		}
 
 		//every 30 synctimer seconds list compare upload download
@@ -81,7 +81,8 @@ public class SecFileManager {
 	}
 
 	//TODO might need to add checks for lists not being empty
-	private Map<String, String> FileListCompare(List<FileInfo> serverFiles) {
+	//what a terrible name for a method
+	private Map<String, String> getFileSyncRequiredOperations(List<FileInfo> serverFiles) {
 
 		//sets to contain file data
 		HashMap<String, Long> localFileData = new HashMap<String, Long>();
