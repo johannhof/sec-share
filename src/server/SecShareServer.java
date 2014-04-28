@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocketFactory;
+
 public class SecShareServer {
 
     public static final String SERVER_REPO = "./serverdir";
@@ -31,8 +34,10 @@ public class SecShareServer {
 
         //open server socket
         try {
-            final ServerSocket serverSocket = new ServerSocket(port);
-
+        	
+        	ServerSocketFactory ssf = SSLServerSocketFactory.getDefault( );
+        	ServerSocket serverSocket = ssf.createServerSocket( );
+        	
             System.out.println("\nNow listening on port " + port + "\n");
             //start listening for incoming requests
             while (true)

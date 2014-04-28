@@ -6,6 +6,9 @@ import message.*;
 import java.io.*;
 import java.net.Socket;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
+
 public class NetworkClient {
 
     Socket clientSocket;
@@ -18,7 +21,9 @@ public class NetworkClient {
         this.userID = userID;
 
         try {
-            this.clientSocket = new Socket(host, port);
+        	SocketFactory sf = SSLSocketFactory.getDefault( );
+        	this.clientSocket = sf.createSocket(host, port);
+        	
             System.out.println("Connected to " + host + " in port " + port + "\n");
 
             this.outStream = clientSocket.getOutputStream();
