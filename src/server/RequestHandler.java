@@ -105,7 +105,27 @@ public class RequestHandler implements Runnable {
 
                                 // loop through user.key files and replace with new version
 
-                                file.listFiles((dir, name) -> name.matches("asdkfjn"));
+                                final File keyFiles = new File(keyDir + "/" + user.getName(),
+                                        file.getName() + "." + user.getName() + ".key").getParentFile();
+
+                                for (final File keyFile : keyFiles.listFiles((dir, name) -> name.startsWith(file.getName()))) {
+                                    try {
+                                        String name = keyFile.getName().split(file.getName())[0].split(".key")[0];
+
+                                        final PublicKey publicKey = user.getPublicKey();
+                                        cipher.init(Cipher.WRAP_MODE, publicKey);
+                                        final byte[] wrap = cipher.wrap(secretKey);
+
+                                        keyFile.getParentFile().mkdirs(); // create all parent dirs
+
+                                        final FileOutputStream outputStream = new FileOutputStream(keyFile);
+                                        outputStream.write(wrap);
+                                        outputStream.flush();
+                                        outputStream.close();
+                                    } catch (KeyStoreException | IllegalBlockSizeException | InvalidKeyException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
 
                                 file.setLastModified(putMessage.getTimestamp());
                             }
@@ -113,6 +133,8 @@ public class RequestHandler implements Runnable {
                             final SharedFile file = new SharedFile(this.storageDir + "/" + user.getName(), putMessage.getFilename());
 
                             respond(new Reply(true), objectOutputStream);
+
+                            // final SecretKey = download and unwrap key
 
                             file.download(inputStream, putMessage.getFilesize(), (bytes, last) -> {
                                 if (last) {

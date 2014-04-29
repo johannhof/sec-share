@@ -3,11 +3,16 @@ package client;
 import file_services.SharedFile;
 import message.*;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 import java.io.*;
 import java.net.Socket;
-
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLSocketFactory;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 
 public class NetworkClient {
 
@@ -21,9 +26,25 @@ public class NetworkClient {
         this.userID = userID;
 
         try {
-        	SocketFactory sf = SSLSocketFactory.getDefault( );
-        	this.clientSocket = sf.createSocket(host, port);
-        	
+
+            final String pw = "clienta";
+
+            final String home = System.getProperty("user.home");
+            final File clientKeyStore = new File(home, ".secshare/" + userID + "/truststore.jks");
+
+            /* Create keystore */
+            final KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(new FileInputStream(clientKeyStore), pw.toCharArray());
+
+            /* Get factory for the given keystore */
+            final TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(keyStore);
+            final SSLContext ctx = SSLContext.getInstance("SSL");
+            ctx.init(null, tmf.getTrustManagers(), null);
+            final SSLSocketFactory factory = ctx.getSocketFactory();
+
+            this.clientSocket = factory.createSocket(host, port);
+
             System.out.println("Connected to " + host + " in port " + port + "\n");
 
             this.outStream = clientSocket.getOutputStream();
@@ -34,13 +55,15 @@ public class NetworkClient {
         } catch (final IOException ioExp) {
             System.out.println("Error connecting to " + host + " in port " + port);
 
-            if (this.clientSocket.isBound())
+            if (this.clientSocket != null && this.clientSocket.isBound())
                 try {
                     this.clientSocket.close();
                 } catch (final IOException ioExp2) {
                     ioExp2.printStackTrace();
                 }
             ioExp.printStackTrace();
+        } catch (CertificateException | KeyManagementException | KeyStoreException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
 
     }

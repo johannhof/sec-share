@@ -56,7 +56,7 @@ public class SecShareClient {
                 final SharedFile file = new SharedFile(CLIENT_HOME, args[i++]);
                 clientFiles.add(file);
             }
-            
+
         }
 
         // parse address
@@ -66,6 +66,20 @@ public class SecShareClient {
             System.err.println("Invalid address");
             System.exit(-1);
         }
+
+
+//
+//        try (FileInputStream fis = new FileInputStream(clientKeyStore)) {
+//            final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+//            ks.load(fis, pw.toCharArray());
+//            // store away the keystore
+//            try (FileOutputStream fos = new FileOutputStream(clientKeyStore)) {
+//                ks.store(fos, pw.toCharArray());
+//            }
+//
+//        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException e) {
+//            e.printStackTrace();
+//        }
 
         //connect to the server
         final NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]), CLIENT_HOME);
@@ -98,6 +112,7 @@ public class SecShareClient {
                 System.out.println("Sorry. Try again.");
             }
         }
+
 
         try {
             inputReader.close();

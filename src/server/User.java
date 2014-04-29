@@ -64,6 +64,6 @@ public class User implements Serializable {
     }
 
     public PublicKey getPublicKey() throws KeyStoreException {
-        return KeyStore.getInstance("JSK").getCertificate(name).getPublicKey();
+        return KeyStore.getInstance("JKS").getCertificate(name).getPublicKey();
     }
 }

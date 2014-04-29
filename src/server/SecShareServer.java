@@ -1,16 +1,23 @@
 package server;
 
-import javax.net.ServerSocketFactory;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.security.*;
+import java.security.cert.CertificateException;
 
 public class SecShareServer {
 
     public static final String SERVER_REPO = "./serverdir";
 
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws KeyStoreException {
+
+        // get user password and file input stream
+        final String password = "server";
 
         int port = 0;
 
@@ -34,8 +41,18 @@ public class SecShareServer {
         //open server socket
         try {
 
-            final ServerSocketFactory ssf = SSLServerSocketFactory.getDefault();
-            final ServerSocket serverSocket = ssf.createServerSocket();
+            final KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(new FileInputStream(SERVER_REPO + "/keystore.jks"), password.toCharArray());
+
+            final SSLContext ctx = SSLContext.getInstance("SSL");
+
+            final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf.init(keyStore, password.toCharArray());
+            ctx.init(kmf.getKeyManagers(), null, null);
+
+            final SSLServerSocketFactory factory = ctx.getServerSocketFactory();
+
+            final ServerSocket serverSocket = factory.createServerSocket(port);
 
             System.out.println("\nNow listening on port " + port + "\n");
             //start listening for incoming requests
@@ -46,6 +63,8 @@ public class SecShareServer {
             System.out.println("Error while trying to listen on port: " + port);
             ioe1.printStackTrace();
             System.exit(-1);
+        } catch (CertificateException | NoSuchAlgorithmException | KeyManagementException | UnrecoverableKeyException e) {
+            e.printStackTrace();
         }
 
     }
