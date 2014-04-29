@@ -9,6 +9,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.*;
+import java.security.cert.CertificateException;
 import java.util.List;
 
 public class RequestHandler implements Runnable {
@@ -42,7 +43,8 @@ public class RequestHandler implements Runnable {
         final UserManager userManager = UserManager.getInstance();
         User user = null;
         try {
-            final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            final KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            trustStore.load(new FileInputStream(root.getAbsolutePath() + "/truststore.jks"), "trusted".toCharArray());
             final InputStream inputStream = socket.getInputStream();
             while (true) {
                 final ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
@@ -70,6 +72,7 @@ public class RequestHandler implements Runnable {
                         final KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
                         keyGenerator.init(128, new SecureRandom());
                         final SecretKey secretKey = keyGenerator.generateKey();
+                        final Cipher cipher = Cipher.getInstance("AES");
                         try {
                             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
                         } catch (final InvalidKeyException e) {
@@ -110,11 +113,13 @@ public class RequestHandler implements Runnable {
 
                                 for (final File keyFile : keyFiles.listFiles((dir, name) -> name.startsWith(file.getName()))) {
                                     try {
-                                        String name = keyFile.getName().split(file.getName())[0].split(".key")[0];
+                                        // ugly regex splitting to filter out user name
+                                        final String name = keyFile.getName().split(file.getName() + ".")[1].split(".key")[0];
 
-                                        final PublicKey publicKey = user.getPublicKey();
-                                        cipher.init(Cipher.WRAP_MODE, publicKey);
-                                        final byte[] wrap = cipher.wrap(secretKey);
+                                        final Cipher rsa_cipher = Cipher.getInstance("RSA");
+                                        final PublicKey publicKey = trustStore.getCertificate(userManager.find(name).getName()).getPublicKey();
+                                        rsa_cipher.init(Cipher.WRAP_MODE, publicKey);
+                                        final byte[] wrap = rsa_cipher.wrap(secretKey);
 
                                         keyFile.getParentFile().mkdirs(); // create all parent dirs
 
@@ -148,9 +153,10 @@ public class RequestHandler implements Runnable {
                             });
 
                             try {
-                                final PublicKey publicKey = user.getPublicKey();
-                                cipher.init(Cipher.WRAP_MODE, publicKey);
-                                final byte[] wrap = cipher.wrap(secretKey);
+                                final PublicKey publicKey = trustStore.getCertificate(user.getName()).getPublicKey();
+                                final Cipher rsa_cipher = Cipher.getInstance("RSA");
+                                rsa_cipher.init(Cipher.WRAP_MODE, publicKey);
+                                final byte[] wrap = rsa_cipher.wrap(secretKey);
 
                                 final File keyFile = new File(keyDir + "/" + user.getName(),
                                         file.getName() + "." + user.getName() + ".key");
@@ -266,6 +272,8 @@ public class RequestHandler implements Runnable {
                             respond(new Reply(false), objectOutputStream);
                         } else {
                             respond(new Reply(true), objectOutputStream);
+                            // TODO improve
+                            trustStore.setCertificateEntry(user.getName(), loginMessage.getCertificate());
                         }
 
                         continue;
@@ -276,7 +284,9 @@ public class RequestHandler implements Runnable {
             }
         } catch (SocketException | EOFException e) {
             System.out.println("Client disconnected");
-        } catch (ClassNotFoundException | IOException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+        } catch (ClassNotFoundException | IOException | NoSuchAlgorithmException | NoSuchPaddingException | KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
             e.printStackTrace();
         }
     }

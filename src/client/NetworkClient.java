@@ -12,14 +12,17 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
 public class NetworkClient {
 
-    Socket clientSocket;
-    String userID;
-    OutputStream outStream;
-    InputStream inStream;
+    private Certificate certificate;
+    private Socket clientSocket;
+    private String userID;
+    private OutputStream outStream;
+    private InputStream inStream;
+
 
     public NetworkClient(final String userID, final String host, final int port, final String clientHome) {
 
@@ -42,6 +45,8 @@ public class NetworkClient {
             final SSLContext ctx = SSLContext.getInstance("SSL");
             ctx.init(null, tmf.getTrustManagers(), null);
             final SSLSocketFactory factory = ctx.getSocketFactory();
+
+            this.certificate = keyStore.getCertificate(userID);
 
             this.clientSocket = factory.createSocket(host, port);
 
@@ -69,7 +74,7 @@ public class NetworkClient {
     }
 
     public boolean login(final String username, final String password) {
-        final Reply reply = (Reply) msgSendReceive(new LoginMessage(username, password));
+        final Reply reply = (Reply) msgSendReceive(new LoginMessage(username, password, certificate));
         return reply.isSuccess();
     }
 
