@@ -3,6 +3,9 @@ package server;
 import file_services.FileInfo;
 
 import java.io.Serializable;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,5 +61,9 @@ public class User implements Serializable {
             }
         }
         return null;
+    }
+
+    public PublicKey getPublicKey() throws KeyStoreException {
+        return KeyStore.getInstance("JSK").getCertificate(name).getPublicKey();
     }
 }

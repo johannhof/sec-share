@@ -50,13 +50,17 @@ public class SharedFile extends File {
         }
     }
 
+    public void download(final InputStream inputStream, final long filesize) {
+        download(inputStream, filesize, null);
+    }
+
     /**
      * Saves the file by loading the specified number of bytes from the specified stream.
      *
      * @param inputStream the stream to load data from
      * @param filesize    number of bytes to load
      */
-    public void download(final InputStream inputStream, final long filesize) {
+    public void download(final InputStream inputStream, final long filesize, final CryptoHelper cryptoHelper) {
         assert inputStream != null;
 
         // make sure that the path exists
@@ -74,9 +78,13 @@ public class SharedFile extends File {
             while (aux > 0) {
                 bytesRead = inputStream.read(buffer, 0, 1024);
                 aux -= bytesRead;
+                if (cryptoHelper != null) {
+                    buffer = cryptoHelper.transform(buffer, aux > 0);
+                }
                 fileOutputStream.write(buffer, 0, (int) bytesRead);
                 buffer = new byte[1024];
             }
+
 
             fileOutputStream.flush();
         } catch (final IOException e) {
