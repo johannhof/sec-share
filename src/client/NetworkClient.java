@@ -1,43 +1,41 @@
 package client;
 
+import external.CertificationAuthority;
 import file_services.SharedFile;
 import message.*;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.*;
 import java.net.Socket;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 
 public class NetworkClient {
 
+    private final String userID;
+    private KeyStore keyStore;
     private Certificate certificate;
     private Socket clientSocket;
-    private String userID;
     private OutputStream outStream;
     private InputStream inStream;
 
-
-    public NetworkClient(final String userID, final String host, final int port, final String clientHome) {
-
+    public NetworkClient(final String userID, final String host, final int port) {
         this.userID = userID;
 
         try {
-
-            final String pw = "clienta";
-
             final String home = System.getProperty("user.home");
             final File clientKeyStore = new File(home, ".secshare/" + userID + "/truststore.jks");
 
             /* Create keystore */
-            final KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(new FileInputStream(clientKeyStore), pw.toCharArray());
+            keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            // TODO password == userID, this is not good
+            keyStore.load(new FileInputStream(clientKeyStore), userID.toCharArray());
 
             /* Get factory for the given keystore */
             final TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
@@ -70,12 +68,18 @@ public class NetworkClient {
         } catch (CertificateException | KeyManagementException | KeyStoreException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-
     }
 
     public boolean login(final String username, final String password) {
-        final Reply reply = (Reply) msgSendReceive(new LoginMessage(username, password, certificate));
-        return reply.isSuccess();
+        try {
+            final byte[] signature = CertificationAuthority.getInstance().sign(certificate);
+            final Reply reply = (Reply) msgSendReceive(new LoginMessage(username, password, certificate, signature));
+            return reply.isSuccess();
+        } catch (SignatureException | CertificateEncodingException | InvalidKeyException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     public void disconnect() {
@@ -147,20 +151,43 @@ public class NetworkClient {
         assert file != null;
 
         // request a download on the server
-        final DownloadReply reply = (DownloadReply) msgSendReceive(new GetMessage(file.getName()));
+        final Reply dreply = (Reply) msgSendReceive(new GetMessage(file.getName()));
+
 
         // if the server allows the download
-        if (reply.isSuccess()) {
-            file.download(inStream, reply.getNumber());
-            file.setLastModified(reply.getTimestamp());
-            System.out.println(file.getName() + "was downloaded");
-            return true;
+        if (dreply.isSuccess()) {
+            final DownloadReply reply = (DownloadReply) dreply;
+            try {
+
+                final Key privateKey = keyStore.getKey(userID, userID.toCharArray());
+                final Cipher rsa_cipher = Cipher.getInstance("RSA");
+                rsa_cipher.init(Cipher.UNWRAP_MODE, privateKey);
+
+                final Key secretKey = rsa_cipher.unwrap(reply.getKey(), "AES", Cipher.SECRET_KEY);
+
+                final Cipher cipher = Cipher.getInstance("AES");
+                cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+                file.download(inStream, reply.getNumber(), (bytes, last) -> {
+//                    if (last) {
+//                        try {
+//                            return cipher.doFinal(bytes);
+//                        } catch (IllegalBlockSizeException | BadPaddingException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+                    return cipher.update(bytes);
+                });
+
+                file.setLastModified(reply.getTimestamp());
+                System.out.println(file.getName() + "was downloaded");
+                return true;
+            } catch (final InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | UnrecoverableKeyException | KeyStoreException e) {
+                e.printStackTrace();
+            }
         }
 
-        System.err.println(reply.getMessage());
+        System.err.println(dreply.getMessage());
         return false;
     }
-
-    //might be better to add methods to upload / download several files
-
 }

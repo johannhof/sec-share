@@ -7,14 +7,16 @@ public class LoginMessage extends Message {
     private final String username;
     private final String password;
     private final Certificate certificate;
+    private final byte[] signature;
 
-    public LoginMessage(final String username, final String password, final Certificate certificate) {
+    public LoginMessage(final String username, final String password, final Certificate certificate, final byte[] signature) {
         super(OpCode.LOGIN);
 
         this.username = username;
         this.password = password;
 
         this.certificate = certificate;
+        this.signature = signature;
     }
 
     public String getUsername() {
@@ -27,5 +29,9 @@ public class LoginMessage extends Message {
 
     public Certificate getCertificate() {
         return certificate;
+    }
+
+    public byte[] getSignature() {
+        return signature;
     }
 }

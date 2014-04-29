@@ -1,5 +1,7 @@
 package server;
 
+import external.CertificationAuthority;
+
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -15,6 +17,8 @@ public class SecShareServer {
     public static final String SERVER_REPO = "./serverdir";
 
     public static void main(final String[] args) throws KeyStoreException {
+
+        CertificationAuthority.getInstance().init("./authority.jks");
 
         // get user password and file input stream
         final String password = "server";

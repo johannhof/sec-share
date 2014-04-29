@@ -1,5 +1,6 @@
 package server;
 
+import external.CertificationAuthority;
 import file_services.FileInfo;
 import file_services.SharedFile;
 import message.*;
@@ -96,13 +97,13 @@ public class RequestHandler implements Runnable {
                             } else {
                                 respond(new Reply(true), objectOutputStream);
                                 file.download(inputStream, putMessage.getFilesize(), (bytes, last) -> {
-                                    if (last) {
-                                        try {
-                                            return cipher.doFinal(bytes);
-                                        } catch (IllegalBlockSizeException | BadPaddingException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
+//                                    if (last) {
+//                                        try {
+//                                            return cipher.doFinal(bytes);
+//                                        } catch (IllegalBlockSizeException | BadPaddingException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    }
                                     return cipher.update(bytes);
                                 });
 
@@ -117,7 +118,7 @@ public class RequestHandler implements Runnable {
                                         final String name = keyFile.getName().split(file.getName() + ".")[1].split(".key")[0];
 
                                         final Cipher rsa_cipher = Cipher.getInstance("RSA");
-                                        final PublicKey publicKey = trustStore.getCertificate(userManager.find(name).getName()).getPublicKey();
+                                        final PublicKey publicKey = trustStore.getCertificate(name).getPublicKey();
                                         rsa_cipher.init(Cipher.WRAP_MODE, publicKey);
                                         final byte[] wrap = rsa_cipher.wrap(secretKey);
 
@@ -138,8 +139,6 @@ public class RequestHandler implements Runnable {
                             final SharedFile file = new SharedFile(this.storageDir + "/" + user.getName(), putMessage.getFilename());
 
                             respond(new Reply(true), objectOutputStream);
-
-                            // final SecretKey = download and unwrap key
 
                             file.download(inputStream, putMessage.getFilesize(), (bytes, last) -> {
                                 if (last) {
@@ -198,12 +197,33 @@ public class RequestHandler implements Runnable {
                             respond(new Reply(false, "Could not find file"), objectOutputStream);
                         } else {
                             final SharedFile file = new SharedFile(this.storageDir + "/" + fileInfo.getOwner(), fileInfo.getFilename());
+                            final SharedFile keyFile = new SharedFile(this.keyDir + "/" + fileInfo.getOwner(),
+                                    fileInfo.getFilename() + "." + user.getName() + ".key");
 
                             if (!file.exists() || file.isDirectory()) {
                                 respond(new Reply(false, "Could not find file"), objectOutputStream);
                             } else {
-                                respond(new DownloadReply(true, file.length(), file.lastModified()), objectOutputStream);
-                                file.upload(socket.getOutputStream());
+
+                                BufferedInputStream bis = null;
+                                try {
+                                    final byte[] keybytes = new byte[(int) keyFile.length()];
+                                    bis = new BufferedInputStream(new FileInputStream(keyFile));
+                                    bis.read(keybytes, 0, keybytes.length);
+
+                                    respond(new DownloadReply(true, file.length(), file.lastModified(), keybytes), objectOutputStream);
+                                    file.upload(socket.getOutputStream());
+                                } catch (final IOException e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    try {
+                                        if (bis != null) {
+                                            bis.close();
+                                        }
+                                    } catch (final IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
                             }
                         }
 
@@ -254,6 +274,11 @@ public class RequestHandler implements Runnable {
                             continue;
                         }
 
+                        final File keyFile = new File(this.keyDir + "/" + fileInfo.getOwner(),
+                                fileInfo.getFilename() + "." + targetUser.getName() + ".key");
+
+                        keyFile.createNewFile();
+
                         targetUser.getFiles().add(fileInfo);
                         userManager.save();
 
@@ -272,8 +297,17 @@ public class RequestHandler implements Runnable {
                             respond(new Reply(false), objectOutputStream);
                         } else {
                             respond(new Reply(true), objectOutputStream);
-                            // TODO improve
-                            trustStore.setCertificateEntry(user.getName(), loginMessage.getCertificate());
+
+                            try {
+                                if (CertificationAuthority.getInstance().verify(loginMessage.getSignature())) {
+                                    trustStore.setCertificateEntry(user.getName(), loginMessage.getCertificate());
+                                    trustStore.store(new FileOutputStream(root.getAbsolutePath() + "/truststore.jks"), "trusted".toCharArray());
+                                } else {
+                                    respond(new Reply(false), objectOutputStream);
+                                }
+                            } catch (SignatureException e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         continue;
@@ -284,9 +318,12 @@ public class RequestHandler implements Runnable {
             }
         } catch (SocketException | EOFException e) {
             System.out.println("Client disconnected");
-        } catch (ClassNotFoundException | IOException | NoSuchAlgorithmException | NoSuchPaddingException | KeyStoreException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
+        } catch (ClassNotFoundException
+                | IOException
+                | NoSuchAlgorithmException
+                | NoSuchPaddingException
+                | KeyStoreException
+                | CertificateException e) {
             e.printStackTrace();
         }
     }

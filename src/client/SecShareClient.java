@@ -1,5 +1,6 @@
 package client;
 
+import external.CertificationAuthority;
 import file_services.SharedFile;
 
 import java.io.BufferedReader;
@@ -16,6 +17,8 @@ public class SecShareClient {
 
     //SecShareClient -u <userId> -a <serverAddress> ( -c <filenames> | -p <userId> <filenames> | -g <filenames> | -s <filenames>)
     public static void main(final String[] args) {
+
+        CertificationAuthority.getInstance().init("../authority.jks");
 
         final String userID;
         final String serverAddress;
@@ -67,22 +70,8 @@ public class SecShareClient {
             System.exit(-1);
         }
 
-
-//
-//        try (FileInputStream fis = new FileInputStream(clientKeyStore)) {
-//            final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-//            ks.load(fis, pw.toCharArray());
-//            // store away the keystore
-//            try (FileOutputStream fos = new FileOutputStream(clientKeyStore)) {
-//                ks.store(fos, pw.toCharArray());
-//            }
-//
-//        } catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | IOException e) {
-//            e.printStackTrace();
-//        }
-
         //connect to the server
-        final NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]), CLIENT_HOME);
+        final NetworkClient netClient = new NetworkClient(userID, serverAddressAux[0], Integer.parseInt(serverAddressAux[1]));
 
         System.out.println("Welcome to SecShare\n");
 
@@ -132,6 +121,7 @@ public class SecShareClient {
                 break;
             case "-p":
                 mFileManager.ShareFiles(targetUser);
+                mFileManager.uploadAll();
                 break;
             case "-g":
                 mFileManager.downloadAll();
