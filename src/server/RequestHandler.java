@@ -1,6 +1,7 @@
 package server;
 
 import external.CertificationAuthority;
+import file_services.CryptoHelper;
 import file_services.FileInfo;
 import file_services.SharedFile;
 import message.*;
@@ -96,15 +97,11 @@ public class RequestHandler implements Runnable {
                                 ), objectOutputStream);
                             } else {
                                 respond(new Reply(true), objectOutputStream);
-                                file.download(inputStream, putMessage.getFilesize(), (bytes, last) -> {
-//                                    if (last) {
-//                                        try {
-//                                            return cipher.doFinal(bytes);
-//                                        } catch (IllegalBlockSizeException | BadPaddingException e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                    }
-                                    return cipher.update(bytes);
+                                file.download(inputStream, putMessage.getFilesize(), new CryptoHelper() {
+                                    @Override
+                                    public byte[] transform(byte[] bytes, boolean last) {
+                                        return cipher.update(bytes);
+                                    }
                                 });
 
                                 // loop through user.key files and replace with new version
@@ -112,7 +109,12 @@ public class RequestHandler implements Runnable {
                                 final File keyFiles = new File(keyDir + "/" + user.getName(),
                                         file.getName() + "." + user.getName() + ".key").getParentFile();
 
-                                for (final File keyFile : keyFiles.listFiles((dir, name) -> name.startsWith(file.getName()))) {
+                                for (final File keyFile : keyFiles.listFiles(new FilenameFilter() {
+                                    @Override
+                                    public boolean accept(File dir, String name) {
+                                        return name.startsWith(file.getName());
+                                    }
+                                })) {
                                     try {
                                         // ugly regex splitting to filter out user name
                                         final String name = keyFile.getName().split(file.getName() + ".")[1].split(".key")[0];
@@ -140,15 +142,18 @@ public class RequestHandler implements Runnable {
 
                             respond(new Reply(true), objectOutputStream);
 
-                            file.download(inputStream, putMessage.getFilesize(), (bytes, last) -> {
-                                if (last) {
-                                    try {
-                                        return cipher.doFinal(bytes);
-                                    } catch (IllegalBlockSizeException | BadPaddingException e) {
-                                        e.printStackTrace();
+                            file.download(inputStream, putMessage.getFilesize(), new CryptoHelper() {
+                                @Override
+                                public byte[] transform(byte[] bytes, boolean last) {
+                                    if (last) {
+                                        try {
+                                            return cipher.doFinal(bytes);
+                                        } catch (IllegalBlockSizeException | BadPaddingException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
+                                    return cipher.update(bytes);
                                 }
-                                return cipher.update(bytes);
                             });
 
                             try {

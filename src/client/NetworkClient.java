@@ -1,6 +1,7 @@
 package client;
 
 import external.CertificationAuthority;
+import file_services.CryptoHelper;
 import file_services.SharedFile;
 import message.*;
 
@@ -168,15 +169,11 @@ public class NetworkClient {
                 final Cipher cipher = Cipher.getInstance("AES");
                 cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
-                file.download(inStream, reply.getNumber(), (bytes, last) -> {
-//                    if (last) {
-//                        try {
-//                            return cipher.doFinal(bytes);
-//                        } catch (IllegalBlockSizeException | BadPaddingException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-                    return cipher.update(bytes);
+                file.download(inStream, reply.getNumber(), new CryptoHelper() {
+                    @Override
+                    public byte[] transform(byte[] bytes, boolean last) {
+                        return cipher.update(bytes);
+                    }
                 });
 
                 file.setLastModified(reply.getTimestamp());
